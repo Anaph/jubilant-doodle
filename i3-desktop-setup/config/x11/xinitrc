@@ -1,0 +1,7 @@
+#!/bin/sh
+# ~/.xinitrc — launched by `startx` (the --boot=startx path).
+# Source the shared session environment, then start i3.
+
+[ -f "$HOME/.xsessionrc" ] && . "$HOME/.xsessionrc"
+
+exec i3

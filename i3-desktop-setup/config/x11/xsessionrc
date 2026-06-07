@@ -1,0 +1,8 @@
+# ~/.xsessionrc — environment for the graphical session.
+# Sourced by the Debian X session startup (used by LightDM) and by ~/.xinitrc
+# (the startx path), so it applies to both boot methods.
+
+# If Alacritty shows a black window or fails with a GL/EGL error on the Pi's
+# VideoCore GPU, uncomment the line below to force software GL rendering, then
+# restart the session:
+# export LIBGL_ALWAYS_SOFTWARE=1

@@ -1,0 +1,69 @@
+/* rofi configuration — managed by i3-desktop-setup (Tokyo Night look). */
+
+configuration {
+    modi:          "drun,run,window";
+    show-icons:    true;
+    icon-theme:    "Papirus";
+    display-drun:  "Apps";
+    display-run:   "Run";
+    display-window:"Win";
+}
+
+* {
+    bg:     #1a1b26;
+    bg-alt: #24283b;
+    fg:     #c0caf5;
+    fg-dim: #565f89;
+    accent: #7aa2f7;
+
+    background-color: transparent;
+    text-color:       @fg;
+}
+
+window {
+    background-color: @bg;
+    border:           2px;
+    border-color:     @accent;
+    border-radius:    8px;
+    width:            38%;
+    padding:          10px;
+}
+
+mainbox {
+    children: [ inputbar, listview ];
+    spacing:  8px;
+}
+
+inputbar {
+    background-color: @bg-alt;
+    border-radius:    6px;
+    padding:          8px;
+    children:         [ prompt, entry ];
+    spacing:          8px;
+}
+
+prompt { text-color: @accent; }
+
+entry {
+    placeholder:       "Search…";
+    placeholder-color: @fg-dim;
+}
+
+listview {
+    lines:     8;
+    scrollbar: false;
+    spacing:   4px;
+}
+
+element {
+    padding:       6px;
+    border-radius: 6px;
+}
+
+element selected {
+    background-color: @accent;
+    text-color:       @bg;
+}
+
+element-icon { size: 1.2em; }
+element-text { vertical-align: 0.5; }

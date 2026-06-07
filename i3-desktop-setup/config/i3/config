@@ -1,0 +1,167 @@
+# i3 config — managed by i3-desktop-setup.
+# Docs: https://i3wm.org/docs/userguide.html
+#
+# The colour palette is kept in a separate file so the theme can be swapped
+# independently. It is included early (below) so its variables are defined
+# before the bar block references them.
+
+set $mod Mod4
+
+# Theme palette: defines $bg/$fg/$accent/... and all client.* window colours.
+include ~/.config/i3/colors.conf
+
+# Fonts for window titles and the bar.
+font pango:Fira Code 10
+
+# Use Mouse+$mod to drag floating windows.
+floating_modifier $mod
+
+# --- Applications ----------------------------------------------------------
+# Primary terminal (Alacritty) and a guaranteed-working fallback (xterm).
+bindsym $mod+Return exec --no-startup-id alacritty
+bindsym $mod+Shift+Return exec --no-startup-id xterm
+
+# Application launcher.
+bindsym $mod+d exec --no-startup-id rofi -show drun
+bindsym $mod+Tab exec --no-startup-id rofi -show window
+
+# Kill focused window.
+bindsym $mod+Shift+q kill
+
+# --- Window management -----------------------------------------------------
+# Focus.
+bindsym $mod+j focus left
+bindsym $mod+k focus down
+bindsym $mod+l focus up
+bindsym $mod+semicolon focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move.
+bindsym $mod+Shift+j move left
+bindsym $mod+Shift+k move down
+bindsym $mod+Shift+l move up
+bindsym $mod+Shift+semicolon move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# Split orientation.
+bindsym $mod+h split h
+bindsym $mod+v split v
+
+# Layout.
+bindsym $mod+f fullscreen toggle
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+space focus mode_toggle
+bindsym $mod+a focus parent
+
+# --- Workspaces ------------------------------------------------------------
+set $ws1 "1"
+set $ws2 "2"
+set $ws3 "3"
+set $ws4 "4"
+set $ws5 "5"
+set $ws6 "6"
+set $ws7 "7"
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+
+# --- Session ---------------------------------------------------------------
+bindsym $mod+Shift+c reload
+bindsym $mod+Shift+r restart
+bindsym $mod+Shift+e exec --no-startup-id i3-nagbar -t warning \
+    -m 'Exit i3?' -B 'Yes, exit i3' 'i3-msg exit'
+bindsym $mod+Shift+x exec --no-startup-id i3lock -c 000000
+
+# --- Media / hardware keys -------------------------------------------------
+# Volume via WirePlumber (PipeWire).
+bindsym XF86AudioRaiseVolume exec --no-startup-id wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+bindsym XF86AudioLowerVolume exec --no-startup-id wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym XF86AudioMute exec --no-startup-id wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+# Backlight (no-op if the panel has no software backlight).
+bindsym XF86MonBrightnessUp exec --no-startup-id brightnessctl set +10%
+bindsym XF86MonBrightnessDown exec --no-startup-id brightnessctl set 10%-
+# Screenshots (maim) into ~/Pictures.
+bindsym Print exec --no-startup-id maim "$HOME/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
+bindsym Shift+Print exec --no-startup-id maim --select "$HOME/Pictures/screenshot-$(date +%Y%m%d-%H%M%S).png"
+
+# --- Resize mode -----------------------------------------------------------
+mode "resize" {
+    bindsym j resize shrink width 10 px or 10 ppt
+    bindsym k resize grow height 10 px or 10 ppt
+    bindsym l resize shrink height 10 px or 10 ppt
+    bindsym semicolon resize grow width 10 px or 10 ppt
+    bindsym Left resize shrink width 10 px or 10 ppt
+    bindsym Down resize grow height 10 px or 10 ppt
+    bindsym Up resize shrink height 10 px or 10 ppt
+    bindsym Right resize grow width 10 px or 10 ppt
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym $mod+r mode "default"
+}
+bindsym $mod+r mode "resize"
+
+# --- Appearance: borders + gaps --------------------------------------------
+default_border pixel 2
+default_floating_border pixel 2
+hide_edge_borders smart
+gaps inner 8
+gaps outer 4
+smart_gaps on
+
+# --- Autostart -------------------------------------------------------------
+exec_always --no-startup-id $HOME/.config/i3/scripts/set-wallpaper.sh
+exec_always --no-startup-id picom --config $HOME/.config/picom/picom.conf
+exec --no-startup-id dunst
+exec --no-startup-id nm-applet
+# A polkit agent so GUI tools can request privileges (mounting, NetworkManager).
+exec --no-startup-id /usr/libexec/polkit-gnome-authentication-agent-1
+
+# --- Status bar ------------------------------------------------------------
+bar {
+    status_command i3status
+    position top
+    tray_output primary
+    separator_symbol "  "
+    colors {
+        background $bg
+        statusline $fg
+        separator  $fg_dim
+        #                  border   background  text
+        focused_workspace  $accent  $accent     $bg
+        active_workspace   $bg_alt  $bg_alt     $fg
+        inactive_workspace $bg      $bg         $fg_dim
+        urgent_workspace   $urgent  $urgent     $bg
+        binding_mode       $urgent  $urgent     $bg
+    }
+}

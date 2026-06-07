@@ -1,0 +1,78 @@
+# packages.txt — apt package manifest for the i3 desktop setup.
+#
+# One package per line. Blank lines and '#' comments are ignored. This is the
+# single source of truth used by both the installer (steps/10_apt_packages.sh)
+# and the uninstaller. The display manager (lightdm) is NOT listed here — it is
+# installed conditionally by steps/50_boot_method.sh only for --boot=lightdm.
+# Every package below is available for arm64 in Debian Trixie.
+
+# --- Xorg server + core X utilities ---
+xorg
+xserver-xorg
+x11-xserver-utils
+xinit
+xterm                      # tiny guaranteed-working backup terminal (Alacritty GPU fallback)
+
+# --- i3 window manager stack ---
+i3-wm                      # the window manager itself
+i3status                   # status line generator for the bar
+i3lock                     # screen locker
+suckless-tools             # dmenu (rofi fallback)
+dunst                      # notification daemon
+libnotify-bin              # notify-send for scripts/testing
+
+# --- Launcher + compositor + wallpaper ---
+rofi                       # application launcher (drun mode)
+picom                      # X11 compositor (xrender backend, Pi-safe)
+feh                        # set wallpaper / lightweight image viewer
+
+# --- Terminal emulator ---
+alacritty                  # GPU terminal (primary)
+
+# --- Fonts ---
+fonts-dejavu               # baseline UI/mono coverage
+fonts-firacode             # programming font for Alacritty / i3 bar
+fonts-noto-color-emoji     # emoji glyphs
+fonts-font-awesome         # icons for the status bar / rofi
+
+# --- Audio (PipeWire stack, the Trixie default) ---
+pipewire                   # audio/video server
+pipewire-pulse             # PulseAudio drop-in daemon
+wireplumber                # session/policy manager for PipeWire
+pipewire-audio             # metapackage pulling audio plugins
+pavucontrol                # GTK volume mixer
+alsa-utils                 # alsamixer / amixer
+
+# --- Network management ---
+network-manager            # nmcli / NetworkManager daemon
+network-manager-gnome      # nm-applet system-tray GUI
+
+# --- Authentication / policy (GUI privilege prompts, mounting) ---
+policykit-1-gnome          # polkit auth agent
+
+# --- File manager + desktop integration ---
+thunar                     # lightweight file manager
+gvfs                       # trash, mounting, network shares
+xdg-user-dirs              # create ~/Downloads, ~/Pictures, etc.
+xdg-utils                  # xdg-open default-app dispatch
+
+# --- Screenshot + clipboard ---
+maim                       # screenshot tool (region/full)
+xclip                      # clipboard piping
+scrot                      # fallback screenshotter
+
+# --- Appearance / theming ---
+lxappearance               # GTK theme/icon/font picker
+arc-theme                  # clean GTK theme
+papirus-icon-theme         # icon set
+
+# --- Utilities ---
+git                        # clone this repo + alacritty-theme
+curl                       # claude installer + general fetch
+ca-certificates            # TLS roots for https
+wget                       # secondary downloader
+unzip                      # generic archive handling
+jq                         # JSON parsing
+brightnessctl              # backlight control bindings
+build-essential            # build deps safety net
+pkg-config                 # common build dep
