@@ -89,6 +89,7 @@ for f in \
     "$TARGET_HOME/.config/dunst/dunstrc" \
     "$TARGET_HOME/.config/rofi/config.rasi" \
     "$TARGET_HOME/.config/alacritty/alacritty.toml" \
+    "$TARGET_HOME/.config/nvim/lua/plugins/dev.lua" \
     "$TARGET_HOME/.xinitrc" \
     "$TARGET_HOME/.xsessionrc"
 do
@@ -134,13 +135,17 @@ if [ "$PURGE" = 1 ]; then
     if confirm "apt-purge ALL packages from packages.txt (this removes Xorg, i3, etc.)?"; then
         need_sudo
         PKGS=()
-        while IFS= read -r line; do
-            line="${line%%#*}"; line="${line//[[:space:]]/}"
-            [ -n "$line" ] && PKGS+=("$line")
-        done <"$REPO_DIR/packages.txt"
+        for manifest in "$REPO_DIR/packages.txt" "$REPO_DIR/packages-extra.txt"; do
+            [ -f "$manifest" ] || continue
+            while IFS= read -r line; do
+                line="${line%%#*}"; line="${line//[[:space:]]/}"
+                [ -n "$line" ] && PKGS+=("$line")
+            done <"$manifest"
+        done
         sudo DEBIAN_FRONTEND=noninteractive apt-get purge -y "${PKGS[@]}" \
             lightdm lightdm-gtk-greeter \
-            blueman bluez usb-modeswitch usb-modeswitch-data tlp powertop zram-tools i3blocks || true
+            blueman bluez usb-modeswitch usb-modeswitch-data tlp powertop zram-tools i3blocks \
+            clang clangd clang-format clang-tidy cmake || true
         sudo DEBIAN_FRONTEND=noninteractive apt-get autoremove -y || true
         sudo systemctl set-default multi-user.target || true
         log_info "Packages purged"

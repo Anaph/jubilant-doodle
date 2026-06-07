@@ -1,0 +1,47 @@
+# packages-extra.txt — curated optional packages, installed by --extras
+# (steps/70_extras.sh). One package per line; '#' comments and blanks ignored.
+# Installed tolerantly: if one package is unavailable it is skipped, not fatal.
+
+# --- Cyberdeck / handheld ---
+qutebrowser                # keyboard-driven, lightweight browser
+zathura                    # keyboard-driven PDF viewer
+zathura-pdf-poppler        # PDF backend for zathura
+mpv                        # lightweight media player
+copyq                      # clipboard manager with history
+redshift                   # night-time colour temperature
+redshift-gtk               # tray applet for redshift
+lm-sensors                 # CPU temps (CM5 throttles under load)
+s-tui                      # terminal thermal/stress monitor
+syncthing                  # P2P file sync, no cloud
+xfce4-power-manager        # battery/brightness/power-button handling in i3
+fastfetch                  # system info (neofetch successor)
+cava                       # console audio visualiser
+
+# --- CLI / dev (pairs with Claude Code) ---
+neovim                     # editor (configured with NvChad by --extras)
+git-delta                  # pretty git diffs
+tig                        # git TUI
+eza                        # modern ls (command: eza)
+zoxide                     # smarter cd
+bat                        # cat with syntax highlight (command: batcat)
+fd-find                    # fast find (command: fdfind)
+fzf                        # fuzzy finder
+ripgrep                    # fast grep (used by Neovim/telescope too)
+pipx                       # install Python CLI tools in isolation
+tealdeer                   # fast tldr client
+shellcheck                 # shell linter
+btop                       # resource monitor
+ncdu                       # disk usage TUI
+rsync                      # file sync/transfer
+
+# --- Network / remote (cyberdeck on 4G) ---
+mosh                       # SSH that survives roaming/latency/sleep
+openssh-server             # incoming SSH
+nmap                       # network scanner
+mtr-tiny                   # traceroute + ping combined
+iperf3                     # throughput testing
+tcpdump                    # packet capture
+wireguard-tools            # WireGuard VPN
+rclone                     # cloud storage sync
+remmina                    # RDP/VNC/SPICE client
+ufw                        # simple firewall front-end (installed, not enabled)

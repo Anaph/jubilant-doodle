@@ -25,6 +25,10 @@ UCONSOLE=0                # ClockworkPi uConsole (CM5) hardware tweaks
 UCONSOLE_SIGNAL=0         # add a 4G-signal bar widget (Huawei HiLink dongle)
 MODEM_IP="192.168.98.1"   # HiLink dongle web/API address
 ROTATE="right"            # uConsole panel rotation: right|left|normal|inverted|skip
+EXTRAS=0                  # install the curated extra package bundles
+NEOVIM=0                  # set up Neovim + NvChad (implied by --extras)
+NO_NVIM=0                 # with --extras, opt out of the Neovim setup
+NVCHAD_REPO="https://github.com/Anaph/NvChad"  # NvChad core fork (branch v2.5)
 
 usage() {
     cat <<'EOF'
@@ -51,6 +55,12 @@ Options:
                           (default: 192.168.98.1).
   --rotate=DIR            uConsole panel rotation: right|left|normal|inverted|skip
                           (default: right).
+  --extras                Install curated extra packages (cyberdeck, CLI/dev,
+                          network) and set up Neovim + NvChad.
+  --neovim                Set up Neovim + NvChad only (implied by --extras).
+  --no-nvim               With --extras, skip the Neovim/NvChad setup.
+  --nvchad-repo=URL       NvChad core repo to use (default: the Anaph/NvChad
+                          fork, branch v2.5).
   --yes                   Assume "yes"; do not prompt.
   -h, --help              Show this help and exit.
 
@@ -68,11 +78,16 @@ for arg in "$@"; do
         --uconsole-signal) UCONSOLE=1; UCONSOLE_SIGNAL=1 ;;
         --modem-ip=*) MODEM_IP="${arg#*=}" ;;
         --rotate=*)  ROTATE="${arg#*=}" ;;
+        --extras)    EXTRAS=1; NEOVIM=1 ;;
+        --neovim)    NEOVIM=1 ;;
+        --no-nvim)   NO_NVIM=1 ;;
+        --nvchad-repo=*) NVCHAD_REPO="${arg#*=}" ;;
         --yes|-y)    ASSUME_YES=1 ;;
         -h|--help)   usage; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; usage >&2; exit 2 ;;
     esac
 done
+[ "$NO_NVIM" = 1 ] && NEOVIM=0
 
 case "$BOOT_METHOD" in
     lightdm|startx) ;;
@@ -91,6 +106,7 @@ TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 export TARGET_USER TARGET_HOME
 export BOOT_METHOD THEME INSTALL_CLAUDE MINIMAL ASSUME_YES
 export UCONSOLE UCONSOLE_SIGNAL MODEM_IP ROTATE
+export EXTRAS NEOVIM NVCHAD_REPO
 
 # --- Load helpers ----------------------------------------------------------
 # shellcheck source=lib/common.sh
@@ -113,6 +129,7 @@ STEPS=(
     40_user_configs
     50_boot_method
     60_uconsole
+    70_extras
     99_summary
 )
 

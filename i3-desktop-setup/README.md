@@ -150,6 +150,48 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focuse
 (`Super+Shift+r`). Если образ ClockworkPi уже крутит панель на уровне KMS —
 ставь `--rotate=skip`.
 
+## Дополнительные пакеты и Neovim (`--extras`)
+
+Флаг `--extras` ставит кураторские наборы пакетов и настраивает **Neovim + NvChad**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focused-mayer-hwNfz/i3-desktop-setup/bootstrap.sh \
+  | bash -s -- --uconsole-signal --extras
+```
+
+Наборы (полный список — в `packages-extra.txt`):
+- **Наладонник/cyberdeck:** qutebrowser, zathura, mpv, copyq, redshift, lm-sensors,
+  s-tui, syncthing, xfce4-power-manager, fastfetch, cava;
+- **CLI/dev:** neovim, git-delta, tig, eza, zoxide, bat, fd-find, fzf, ripgrep,
+  pipx, tealdeer, shellcheck, btop, ncdu, rsync;
+- **Сеть/удалёнка:** mosh, openssh-server, nmap, mtr-tiny, iperf3, tcpdump,
+  wireguard-tools, rclone, remmina, ufw.
+
+Установка терпима к отсутствию пакета: если какой-то недоступен в репозитории, он
+пропускается, остальные ставятся. `ufw` ставится, но **не включается** (чтобы не
+отрезать SSH).
+
+### Neovim + NvChad
+
+`--extras` (или отдельный `--neovim`) разворачивает Neovim с NvChad:
+- клонирует официальный **NvChad starter** в `~/.config/nvim`, а **ядро** NvChad
+  через lazy указывает на твой форк **`Anaph/NvChad`** (ветка `v2.5`); сменить —
+  `--nvchad-repo=URL`, пропустить nvim — `--no-nvim`;
+- кладёт `~/.config/nvim/lua/plugins/dev.lua` с базовыми плагинами:
+  - **Claude Code** — `coder/claudecode.nvim` (нужен `claude` в PATH); клавиши:
+    `<leader>ac` — тоггл, `<leader>af` — фокус, `<leader>as` — отправить выделение;
+  - **git** — `vim-fugitive` + `diffview.nvim` (плюс gitsigns из NvChad);
+  - **C/C++** — LSP `clangd` и форматтер **clang-format** через conform;
+  - **CMake** — `cmake-tools.nvim` (configure/build/run) и опц. LSP
+    `cmake-language-server` (ставится через pipx, если он есть);
+  - парсеры treesitter для c/cpp/cmake/make.
+- ставит тулчейн: `clang clangd clang-format clang-tidy cmake ripgrep fd-find`.
+
+Плагины подтянутся при **первом запуске** `nvim` (lazy.nvim). Можно заранее:
+```bash
+nvim --headless "+Lazy! sync" +qa
+```
+
 ## Удаление
 
 ```bash
