@@ -78,7 +78,13 @@ for f in \
     "$TARGET_HOME/.config/i3/config" \
     "$TARGET_HOME/.config/i3/colors.conf" \
     "$TARGET_HOME/.config/i3/scripts/set-wallpaper.sh" \
+    "$TARGET_HOME/.config/i3/scripts/uconsole.sh" \
     "$TARGET_HOME/.config/i3status/config" \
+    "$TARGET_HOME/.config/i3blocks/config" \
+    "$TARGET_HOME/.config/i3blocks/scripts/4g-signal.sh" \
+    "$TARGET_HOME/.config/i3blocks/scripts/volume.sh" \
+    "$TARGET_HOME/.config/i3blocks/scripts/wifi.sh" \
+    "$TARGET_HOME/.config/i3blocks/scripts/battery.sh" \
     "$TARGET_HOME/.config/picom/picom.conf" \
     "$TARGET_HOME/.config/dunst/dunstrc" \
     "$TARGET_HOME/.config/rofi/config.rasi" \
@@ -114,6 +120,15 @@ if [ -f "$AUTOLOGIN_DROPIN" ]; then
     log_info "Removed tty1 autologin drop-in"
 fi
 
+# --- Undo uConsole system files --------------------------------------------
+for sysf in /etc/udev/rules.d/99-huawei-hilink.rules /etc/tlp.d/01-uconsole.conf; do
+    if [ -f "$sysf" ]; then
+        need_sudo
+        sudo rm -f "$sysf"
+        log_info "Removed $sysf"
+    fi
+done
+
 # --- Optional: purge packages ----------------------------------------------
 if [ "$PURGE" = 1 ]; then
     if confirm "apt-purge ALL packages from packages.txt (this removes Xorg, i3, etc.)?"; then
@@ -123,7 +138,9 @@ if [ "$PURGE" = 1 ]; then
             line="${line%%#*}"; line="${line//[[:space:]]/}"
             [ -n "$line" ] && PKGS+=("$line")
         done <"$REPO_DIR/packages.txt"
-        sudo DEBIAN_FRONTEND=noninteractive apt-get purge -y "${PKGS[@]}" lightdm lightdm-gtk-greeter || true
+        sudo DEBIAN_FRONTEND=noninteractive apt-get purge -y "${PKGS[@]}" \
+            lightdm lightdm-gtk-greeter \
+            blueman bluez usb-modeswitch usb-modeswitch-data tlp powertop zram-tools i3blocks || true
         sudo DEBIAN_FRONTEND=noninteractive apt-get autoremove -y || true
         sudo systemctl set-default multi-user.target || true
         log_info "Packages purged"

@@ -146,6 +146,9 @@ exec --no-startup-id dunst
 exec --no-startup-id nm-applet
 # A polkit agent so GUI tools can request privileges (mounting, NetworkManager).
 exec --no-startup-id /usr/libexec/polkit-gnome-authentication-agent-1
+# uConsole session hook (panel rotation, Bluetooth applet). Created only by
+# --uconsole; a harmless no-op when the script is absent.
+exec_always --no-startup-id test -x $HOME/.config/i3/scripts/uconsole.sh && $HOME/.config/i3/scripts/uconsole.sh
 
 # --- Status bar ------------------------------------------------------------
 bar {

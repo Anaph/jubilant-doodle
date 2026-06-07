@@ -108,6 +108,51 @@ export LIBGL_ALWAYS_SOFTWARE=1
 Это перезапишет тему Alacritty и палитру i3 (для курируемого набора). Затем в i3:
 `Super+Shift+r` (перезапуск i3) — изменения применятся.
 
+## ClockworkPi uConsole (CM5)
+
+Для uConsole есть опциональный модуль с правками под железо. Установка с виджетом
+4G-сигнала и кастомным адресом донгла:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focused-mayer-hwNfz/i3-desktop-setup/bootstrap.sh \
+  | bash -s -- --uconsole-signal --modem-ip=128.128.66.1
+```
+
+Флаги: `--uconsole` (без виджета), `--uconsole-signal` (с виджетом 4G),
+`--modem-ip=IP` (адрес HiLink-донгла, по умолч. `128.128.66.1`),
+`--rotate=right|left|normal|inverted|skip` (поворот панели, по умолч. `right`).
+
+**Что делает модуль (безопасная, десктопная часть):**
+- поворот DSI-панели в landscape (автоопределение выхода `DSI-*`; меняется `--rotate`);
+- батарея (AXP228) в строке состояния; при `--uconsole-signal` — бар на **i3blocks**
+  с виджетом 4G-сигнала, читающим HTTP-API донгла;
+- **Bluetooth** (`bluez` + `blueman`, апплет в трее);
+- **USB HiLink-модем** (Huawei E3372h): `usb-modeswitch` + udev-правило, чтобы
+  ModemManager не перехватывал донгл (он подключается как обычная сетевая карта,
+  NetworkManager поднимает DHCP сам);
+- энергосбережение: `tlp` (с отключённым USB-autosuspend, чтобы не отрубать донгл),
+  сжатый swap `zram`, диагностический `powertop`;
+- увеличенные шрифты под 5″/720p.
+
+**4G-донгл E3372h-153 (HiLink).** Это не serial-модем, а USB-сетевая карта:
+воткнул → `usb0`/`enx…` → NetworkManager даёт DHCP. APN/PIN/сигнал настраиваются в
+браузере по адресу донгла (`http://128.128.66.1` в твоём случае).
+
+> ⚠️ `128.128.66.1` — это публичный диапазон IP. Пока донгл воткнут, реальные хосты
+> сети `128.128.66.0/24` будут недоступны (перекрыты локальным маршрутом). Это твой
+> осознанный выбор адреса — просто имей в виду.
+
+**Что нужно сделать вручную (прошивка — не автоматизируется во избежание «кирпича»):**
+- подключить APT-репозиторий ClockworkPi и поставить `clockworkpi-kernel`,
+  `clockworkpi-cm-firmware` (драйверы панели/клавиатуры/батареи);
+- в `/boot/firmware/config.txt`: `dtoverlay=clockworkpi-uconsole-cm5`,
+  `dtoverlay=vc4-kms-v3d-pi5,cma-384`, `dtparam=pciex1=off`, `dtparam=ant2`;
+- обновить загрузчик CM5: `sudo apt install rpi-eeprom && sudo rpi-eeprom-update -a`.
+
+Если экран встал боком — поменяй `--rotate` (`right`↔`left`) и перезапусти i3
+(`Super+Shift+r`). Если образ ClockworkPi уже крутит панель на уровне KMS —
+ставь `--rotate=skip`.
+
 ## Удаление
 
 ```bash

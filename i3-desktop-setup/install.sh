@@ -21,6 +21,10 @@ THEME="tokyo_night"       # any alacritty-theme name; curated palettes also them
 INSTALL_CLAUDE=1
 MINIMAL=0
 ASSUME_YES=0
+UCONSOLE=0                # ClockworkPi uConsole (CM5) hardware tweaks
+UCONSOLE_SIGNAL=0         # add a 4G-signal bar widget (Huawei HiLink dongle)
+MODEM_IP="128.128.66.1"   # HiLink dongle web/API address
+ROTATE="right"            # uConsole panel rotation: right|left|normal|inverted|skip
 
 usage() {
     cat <<'EOF'
@@ -37,6 +41,16 @@ Options:
                           gruvbox_dark and nord also theme i3 itself.
   --no-claude             Skip installing Claude Code.
   --minimal               Skip the extra "nice-to-have" desktop glue.
+  --uconsole              Apply ClockworkPi uConsole (CM5) tweaks: screen
+                          rotation, battery in the bar, Bluetooth, USB HiLink
+                          modem support, power saving (tlp/zram), larger 720p
+                          fonts.
+  --uconsole-signal       Like --uconsole, plus a 4G-signal widget in the bar
+                          (reads a Huawei HiLink dongle's HTTP API).
+  --modem-ip=IP           HiLink dongle address for the signal widget
+                          (default: 128.128.66.1).
+  --rotate=DIR            uConsole panel rotation: right|left|normal|inverted|skip
+                          (default: right).
   --yes                   Assume "yes"; do not prompt.
   -h, --help              Show this help and exit.
 
@@ -50,6 +64,10 @@ for arg in "$@"; do
         --theme=*) THEME="${arg#*=}" ;;
         --no-claude) INSTALL_CLAUDE=0 ;;
         --minimal)   MINIMAL=1 ;;
+        --uconsole)  UCONSOLE=1 ;;
+        --uconsole-signal) UCONSOLE=1; UCONSOLE_SIGNAL=1 ;;
+        --modem-ip=*) MODEM_IP="${arg#*=}" ;;
+        --rotate=*)  ROTATE="${arg#*=}" ;;
         --yes|-y)    ASSUME_YES=1 ;;
         -h|--help)   usage; exit 0 ;;
         *) echo "Unknown option: $arg" >&2; usage >&2; exit 2 ;;
@@ -72,6 +90,7 @@ TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 [ -n "$TARGET_HOME" ] || TARGET_HOME="$HOME"
 export TARGET_USER TARGET_HOME
 export BOOT_METHOD THEME INSTALL_CLAUDE MINIMAL ASSUME_YES
+export UCONSOLE UCONSOLE_SIGNAL MODEM_IP ROTATE
 
 # --- Load helpers ----------------------------------------------------------
 # shellcheck source=lib/common.sh
@@ -93,6 +112,7 @@ STEPS=(
     30_alacritty_themes
     40_user_configs
     50_boot_method
+    60_uconsole
     99_summary
 )
 
