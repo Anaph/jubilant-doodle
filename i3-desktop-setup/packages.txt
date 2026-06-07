@@ -29,6 +29,9 @@ feh                        # set wallpaper / lightweight image viewer
 # --- Terminal emulator ---
 alacritty                  # GPU terminal (primary)
 
+# --- Web browser ---
+firefox-esr                # default browser (registers x-www-browser)
+
 # --- Fonts ---
 fonts-dejavu               # baseline UI/mono coverage
 fonts-firacode             # programming font for Alacritty / i3 bar

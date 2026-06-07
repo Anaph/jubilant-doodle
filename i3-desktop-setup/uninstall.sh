@@ -123,7 +123,11 @@ if [ -f "$AUTOLOGIN_DROPIN" ]; then
 fi
 
 # --- Undo uConsole system files --------------------------------------------
-for sysf in /etc/udev/rules.d/99-huawei-hilink.rules /etc/tlp.d/01-uconsole.conf; do
+for sysf in \
+    /etc/udev/rules.d/99-huawei-hilink.rules \
+    /etc/tlp.d/01-uconsole.conf \
+    /etc/lightdm/lightdm.conf.d/10-uconsole-rotate.conf \
+    /usr/local/bin/uconsole-rotate.sh; do
     if [ -f "$sysf" ]; then
         need_sudo
         sudo rm -f "$sysf"

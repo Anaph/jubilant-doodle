@@ -25,6 +25,9 @@ bindsym $mod+Shift+Return exec --no-startup-id xterm
 bindsym $mod+d exec --no-startup-id rofi -show drun
 bindsym $mod+Tab exec --no-startup-id rofi -show window
 
+# Web browser (x-www-browser resolves to the installed default, e.g. firefox-esr).
+bindsym $mod+Shift+b exec --no-startup-id x-www-browser
+
 # Kill focused window.
 bindsym $mod+Shift+q kill
 

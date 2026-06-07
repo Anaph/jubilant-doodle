@@ -68,6 +68,7 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 |---------|----------|
 | `Super+Return` | Alacritty (`Super+Shift+Return` — запасной xterm) |
 | `Super+d` | лаунчер приложений (rofi) |
+| `Super+Shift+b` | браузер (firefox-esr / x-www-browser) |
 | `Super+Shift+q` | закрыть окно |
 | `Super+1..0` | переключение рабочих столов |
 | `Super+r` | режим изменения размера |
@@ -80,6 +81,10 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 
 Откройте **новый** терминал (чтобы подхватился `PATH`) и выполните `claude` для
 входа в аккаунт. Если команда не найдена: `source ~/.profile`.
+
+Установщик сначала пробует официальный нативный установщик, а если тот не дал
+рабочий `claude` — автоматически ставит его через npm (`@anthropic-ai/claude-code`,
+бинарь в `/usr/local/bin`). Отдельных действий не требуется.
 
 ## Устранение проблем
 
@@ -130,7 +135,8 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 `--rotate=right|left|normal|inverted|skip` (поворот панели, по умолч. `right`).
 
 **Что делает модуль (безопасная, десктопная часть):**
-- поворот DSI-панели в landscape (автоопределение выхода `DSI-*`; меняется `--rotate`);
+- поворот DSI-панели в landscape — и **на экране входа LightDM**, и в сессии i3
+  (автоопределение выхода `DSI-*`; меняется `--rotate`);
 - батарея (AXP228) в строке состояния; при `--uconsole-signal` — бар на **i3blocks**
   с виджетом 4G-сигнала, читающим HTTP-API донгла;
 - **Bluetooth** (`bluez` + `blueman`, апплет в трее);

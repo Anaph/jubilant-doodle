@@ -49,6 +49,20 @@ eff_rotate="$ROTATE"; [ "$ROTATE" = "skip" ] && eff_rotate=""
 run_as_user sed -i -E "s|^ROTATE=.*|ROTATE=\"$eff_rotate\"|" "$TARGET_HOME/.config/i3/scripts/uconsole.sh"
 log_info "Panel rotation: ${eff_rotate:-<disabled>} (auto-detected DSI output)"
 
+# --- LightDM greeter rotation ----------------------------------------------
+# The login greeter is drawn before i3 starts, so rotate it at the
+# display-manager level too — otherwise the login screen is sideways.
+if [ "$BOOT_METHOD" = "lightdm" ] && [ -n "$eff_rotate" ]; then
+    sudo install -D -m 0755 "$CFG/uconsole/rotate.sh" /usr/local/bin/uconsole-rotate.sh
+    sudo sed -i "s/__ROTATE__/$eff_rotate/" /usr/local/bin/uconsole-rotate.sh
+    sudo install -d -m 0755 /etc/lightdm/lightdm.conf.d
+    sudo tee /etc/lightdm/lightdm.conf.d/10-uconsole-rotate.conf >/dev/null <<'EOF'
+[Seat:*]
+display-setup-script=/usr/local/bin/uconsole-rotate.sh
+EOF
+    log_info "LightDM greeter rotation configured ($eff_rotate)"
+fi
+
 # --- Keep ModemManager off the HiLink dongle -------------------------------
 # The Huawei E3372h is a plain USB-ethernet NIC; ModemManager must not grab it.
 sudo tee /etc/udev/rules.d/99-huawei-hilink.rules >/dev/null <<'EOF'
