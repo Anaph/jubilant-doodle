@@ -48,7 +48,7 @@ network-manager            # nmcli / NetworkManager daemon
 network-manager-gnome      # nm-applet system-tray GUI
 
 # --- Authentication / policy (GUI privilege prompts, mounting) ---
-policykit-1-gnome          # polkit auth agent
+mate-polkit                # polkit auth agent (policykit-1-gnome was removed in Trixie)
 
 # --- File manager + desktop integration ---
 thunar                     # lightweight file manager

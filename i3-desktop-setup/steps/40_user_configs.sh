@@ -11,6 +11,8 @@ CFG="$REPO_DIR/config"
 install_config "$CFG/i3/config"            "$TARGET_HOME/.config/i3/config"
 install_config "$CFG/i3/scripts/set-wallpaper.sh" \
                                            "$TARGET_HOME/.config/i3/scripts/set-wallpaper.sh" 0755
+install_config "$CFG/i3/scripts/polkit-agent.sh" \
+                                           "$TARGET_HOME/.config/i3/scripts/polkit-agent.sh" 0755
 install_config "$CFG/i3status/config"      "$TARGET_HOME/.config/i3status/config"
 install_config "$CFG/picom/picom.conf"     "$TARGET_HOME/.config/picom/picom.conf"
 install_config "$CFG/dunst/dunstrc"        "$TARGET_HOME/.config/dunst/dunstrc"

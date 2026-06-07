@@ -43,5 +43,15 @@ done <"$MANIFEST"
 [ "${#PKGS[@]}" -gt 0 ] || die "no packages parsed from $MANIFEST"
 
 log_info "Installing ${#PKGS[@]} packages (this can take a while on the Pi)…"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${PKGS[@]}"
+# Install the whole set at once; if any single package is unavailable (e.g. a
+# renamed/removed package on a newer Debian), fall back to one-by-one so one bad
+# name never aborts the entire desktop install.
+if ! sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${PKGS[@]}"; then
+    log_warn "Bulk install failed; retrying package-by-package (skipping unavailable ones)"
+    failed=()
+    for p in "${PKGS[@]}"; do
+        sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "$p" || failed+=("$p")
+    done
+    [ "${#failed[@]}" -gt 0 ] && log_warn "Skipped unavailable packages: ${failed[*]}"
+fi
 log_ok "Package installation complete"

@@ -78,6 +78,7 @@ for f in \
     "$TARGET_HOME/.config/i3/config" \
     "$TARGET_HOME/.config/i3/colors.conf" \
     "$TARGET_HOME/.config/i3/scripts/set-wallpaper.sh" \
+    "$TARGET_HOME/.config/i3/scripts/polkit-agent.sh" \
     "$TARGET_HOME/.config/i3/scripts/uconsole.sh" \
     "$TARGET_HOME/.config/i3status/config" \
     "$TARGET_HOME/.config/i3blocks/config" \
