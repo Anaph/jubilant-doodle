@@ -161,3 +161,56 @@ pkg_install_from_manifest() {
     log_info "Installing ${#pkgs[@]} packages from $(basename "$manifest")"
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "$@" "${pkgs[@]}"
 }
+
+# ---------------------------------------------------------------------------
+# Package-system recovery
+# ---------------------------------------------------------------------------
+
+# Temporarily turn update-initramfs into a no-op so a package whose initramfs
+# trigger is currently failing can still be removed. Paired with _initramfs_on.
+_initramfs_off() {
+    if ! dpkg-divert --list /usr/sbin/update-initramfs 2>/dev/null | grep -q update-initramfs; then
+        sudo dpkg-divert --add --rename --divert /usr/sbin/update-initramfs.real \
+            /usr/sbin/update-initramfs >/dev/null 2>&1 || true
+    fi
+    sudo ln -sf /bin/true /usr/sbin/update-initramfs
+}
+
+_initramfs_on() {
+    sudo rm -f /usr/sbin/update-initramfs
+    if dpkg-divert --list /usr/sbin/update-initramfs 2>/dev/null | grep -q update-initramfs; then
+        sudo dpkg-divert --remove --rename /usr/sbin/update-initramfs >/dev/null 2>&1 || true
+    fi
+}
+
+# Recover a half-configured dpkg state so apt can proceed. The usual culprit on
+# Raspberry Pi / uConsole is Plymouth's update-initramfs trigger failing; since
+# Plymouth is only a boot splash, removing it unblocks the install. Acts only
+# when dpkg is actually broken — a no-op on a healthy system.
+heal_dpkg() {
+    local log="/tmp/i3ds-dpkg-heal.log"
+    if sudo dpkg --configure -a 2>"$log"; then
+        return 0
+    fi
+    log_warn "Package system is half-configured — attempting automatic repair…"
+    if grep -qiE 'plymouth|initramfs' "$log"; then
+        log_info "Cause looks like Plymouth/initramfs (common on Pi). Removing Plymouth (boot splash, not needed)."
+        if ! sudo apt-get purge -y 'plymouth*' >/dev/null 2>&1; then
+            # The purge itself is blocked by the broken trigger — neutralise it.
+            _initramfs_off
+            sudo apt-get purge -y 'plymouth*' >/dev/null 2>&1 || true
+            sudo dpkg --configure -a >/dev/null 2>&1 || true
+            _initramfs_on
+            sudo update-initramfs -u >/dev/null 2>&1 || \
+                log_warn "initramfs rebuild still failing (check /boot/firmware free space); Plymouth removed, continuing."
+        fi
+        sudo dpkg --configure -a >/dev/null 2>&1 || true
+    fi
+    if sudo dpkg --configure -a >/dev/null 2>&1; then
+        log_ok "Package system recovered"
+    else
+        log_error "Automatic repair did not finish. Run this and share the output:"
+        log_error "  sudo dpkg --configure -a"
+        die "dpkg is still half-configured"
+    fi
+}

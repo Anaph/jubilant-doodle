@@ -9,7 +9,7 @@
 #
 # Usage (run as your NORMAL user, do NOT prefix with sudo):
 #
-#   curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focused-mayer-hwNfz/i3-desktop-setup/bootstrap.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-desktop-setup/bootstrap.sh | bash
 #
 # To pass options through the pipe, use the `bash -s --` form, e.g.:
 #
@@ -19,7 +19,7 @@ set -euo pipefail
 
 REPO_SLUG="Anaph/jubilant-doodle"
 REPO_GIT_URL="https://github.com/${REPO_SLUG}.git"
-BRANCH="claude/focused-mayer-hwNfz"
+BRANCH="main"
 # Fallback (no-git / air-gapped): a tarball is available at
 #   https://codeload.github.com/${REPO_SLUG}/tar.gz/refs/heads/${BRANCH}
 # which can be piped through `tar xz`. We prefer git for clean idempotent updates.

@@ -44,6 +44,9 @@ log_ok "Network looks reachable"
 
 # --- Privileges + package index --------------------------------------------
 need_sudo
+# Recover any half-configured dpkg state (e.g. a failed Plymouth/update-initramfs
+# trigger on the Pi) so the package installs below are not blocked.
+heal_dpkg
 log_info "Refreshing apt package index"
 sudo DEBIAN_FRONTEND=noninteractive apt-get update
 log_ok "Preflight complete"

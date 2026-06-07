@@ -21,7 +21,7 @@
 > сам запросит права `sudo`, когда они понадобятся.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focused-mayer-hwNfz/i3-desktop-setup/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-desktop-setup/bootstrap.sh | bash
 ```
 
 По умолчанию: вход через **LightDM**, тема **Tokyo Night**, с установкой Claude Code.
@@ -32,7 +32,7 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focuse
 
 ```bash
 # Автологин в консоль + startx вместо LightDM, тема Nord, без Claude Code:
-curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focused-mayer-hwNfz/i3-desktop-setup/bootstrap.sh \
+curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-desktop-setup/bootstrap.sh \
   | bash -s -- --boot=startx --theme=nord --no-claude
 ```
 
@@ -99,6 +99,13 @@ export LIBGL_ALWAYS_SOFTWARE=1
 `/etc/systemd/system/getty@tty1.service.d/override.conf`, затем
 `sudo systemctl daemon-reload`.
 
+**Ошибка `dpkg`/`update-initramfs` (часто из-за Plymouth) на Pi/uConsole.**
+Установщик чинит это сам: preflight обнаруживает «битое» состояние dpkg и, если
+виноват Plymouth (загрузочная заставка, для десктопа не нужна), аккуратно удаляет
+его и пересобирает initramfs — отдельных команд вводить не нужно, просто запустите
+установку ещё раз. Если падение из-за нехватки места в `/boot/firmware` — в логе
+будет `No space left`; помогает `sudo apt-get autoremove --purge`.
+
 ## Смена темы позже
 
 ```bash
@@ -114,7 +121,7 @@ export LIBGL_ALWAYS_SOFTWARE=1
 4G-сигнала и кастомным адресом донгла:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focused-mayer-hwNfz/i3-desktop-setup/bootstrap.sh \
+curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-desktop-setup/bootstrap.sh \
   | bash -s -- --uconsole-signal --modem-ip=192.168.98.1
 ```
 
@@ -155,7 +162,7 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focuse
 Флаг `--extras` ставит кураторские наборы пакетов и настраивает **Neovim + NvChad**:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focused-mayer-hwNfz/i3-desktop-setup/bootstrap.sh \
+curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-desktop-setup/bootstrap.sh \
   | bash -s -- --uconsole-signal --extras
 ```
 
