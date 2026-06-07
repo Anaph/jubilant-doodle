@@ -64,12 +64,20 @@ if [ ${#need_pkgs[@]} -gt 0 ]; then
 fi
 
 # --- Clone or update the repository ---------------------------------------
+# Update an existing checkout via FETCH_HEAD so it works even if the checkout was
+# previously a single-branch shallow clone of a different branch (a plain
+# `checkout <branch>` would fail with "pathspec did not match"). If the update
+# fails for any reason, fall back to a clean re-clone so a stale checkout can
+# never block the install.
 if [ -d "$CHECKOUT_DIR/.git" ]; then
     say "Updating existing checkout at $CHECKOUT_DIR"
-    git -C "$CHECKOUT_DIR" fetch --quiet --depth 1 origin "$BRANCH"
-    git -C "$CHECKOUT_DIR" checkout --quiet "$BRANCH"
-    git -C "$CHECKOUT_DIR" reset --quiet --hard "origin/$BRANCH"
-else
+    if ! { git -C "$CHECKOUT_DIR" fetch --quiet --depth 1 origin "$BRANCH" \
+        && git -C "$CHECKOUT_DIR" checkout --quiet -B "$BRANCH" FETCH_HEAD; }; then
+        say "Update failed — re-cloning fresh"
+        rm -rf "$CHECKOUT_DIR"
+    fi
+fi
+if [ ! -d "$CHECKOUT_DIR/.git" ]; then
     say "Cloning $REPO_GIT_URL ($BRANCH) into $CHECKOUT_DIR"
     mkdir -p "$(dirname "$CHECKOUT_DIR")"
     git clone --quiet --depth 1 --branch "$BRANCH" "$REPO_GIT_URL" "$CHECKOUT_DIR"
