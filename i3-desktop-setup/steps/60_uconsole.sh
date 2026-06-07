@@ -94,9 +94,17 @@ if [ "$UCONSOLE_SIGNAL" = 1 ]; then
     done
     run_as_user sed -i -E "s|^MODEM_IP=.*|MODEM_IP=\"$MODEM_IP\"|" \
         "$TARGET_HOME/.config/i3blocks/scripts/4g-signal.sh"
+    # Theme the bar segments with the palette accent colour.
+    case "$THEME" in
+        catppuccin_mocha) ACCENT="#89b4fa" ;;
+        gruvbox_dark)     ACCENT="#83a598" ;;
+        nord)             ACCENT="#88c0d0" ;;
+        *)                ACCENT="#7aa2f7" ;;
+    esac
+    run_as_user sed -i "s/__ACCENT__/$ACCENT/g" "$TARGET_HOME/.config/i3blocks/config"
     # Switch the bar generator from i3status to i3blocks.
     run_as_user sed -i 's|status_command i3status|status_command i3blocks|' "$I3CONF"
-    log_ok "Bar: i3blocks with 4G-signal widget (modem $MODEM_IP)"
+    log_ok "Bar: themed i3blocks with 4G-signal + battery (modem $MODEM_IP, accent $ACCENT)"
 else
     I3STATUS="$TARGET_HOME/.config/i3status/config"
     if [ -f "$I3STATUS" ] && ! run_as_user grep -q '"battery 0"' "$I3STATUS"; then
