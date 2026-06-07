@@ -4,9 +4,9 @@
 # Reads the dongle's web API. Prints nothing (empty block) when the dongle is
 # absent or unreachable, so the bar stays clean.
 #
-# MODEM_IP is substituted at install time from --modem-ip (default 128.128.66.1).
+# MODEM_IP is substituted at install time from --modem-ip (default 192.168.98.1).
 
-MODEM_IP="128.128.66.1"
+MODEM_IP="192.168.98.1"
 base="http://$MODEM_IP"
 
 fetch()  { curl -fsS --max-time 2 "$@" 2>/dev/null; }

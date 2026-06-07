@@ -115,11 +115,11 @@ export LIBGL_ALWAYS_SOFTWARE=1
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focused-mayer-hwNfz/i3-desktop-setup/bootstrap.sh \
-  | bash -s -- --uconsole-signal --modem-ip=128.128.66.1
+  | bash -s -- --uconsole-signal --modem-ip=192.168.98.1
 ```
 
 Флаги: `--uconsole` (без виджета), `--uconsole-signal` (с виджетом 4G),
-`--modem-ip=IP` (адрес HiLink-донгла, по умолч. `128.128.66.1`),
+`--modem-ip=IP` (адрес HiLink-донгла, по умолч. `192.168.98.1`),
 `--rotate=right|left|normal|inverted|skip` (поворот панели, по умолч. `right`).
 
 **Что делает модуль (безопасная, десктопная часть):**
@@ -136,11 +136,8 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/claude/focuse
 
 **4G-донгл E3372h-153 (HiLink).** Это не serial-модем, а USB-сетевая карта:
 воткнул → `usb0`/`enx…` → NetworkManager даёт DHCP. APN/PIN/сигнал настраиваются в
-браузере по адресу донгла (`http://128.128.66.1` в твоём случае).
-
-> ⚠️ `128.128.66.1` — это публичный диапазон IP. Пока донгл воткнут, реальные хосты
-> сети `128.128.66.0/24` будут недоступны (перекрыты локальным маршрутом). Это твой
-> осознанный выбор адреса — просто имей в виду.
+браузере по адресу донгла (`http://192.168.98.1`). Этот же адрес нужно задать в
+веб-морде донгла (Настройки → DHCP/домашняя сеть), чтобы он совпал с `--modem-ip`.
 
 **Что нужно сделать вручную (прошивка — не автоматизируется во избежание «кирпича»):**
 - подключить APT-репозиторий ClockworkPi и поставить `clockworkpi-kernel`,

@@ -23,7 +23,7 @@ MINIMAL=0
 ASSUME_YES=0
 UCONSOLE=0                # ClockworkPi uConsole (CM5) hardware tweaks
 UCONSOLE_SIGNAL=0         # add a 4G-signal bar widget (Huawei HiLink dongle)
-MODEM_IP="128.128.66.1"   # HiLink dongle web/API address
+MODEM_IP="192.168.98.1"   # HiLink dongle web/API address
 ROTATE="right"            # uConsole panel rotation: right|left|normal|inverted|skip
 
 usage() {
@@ -48,7 +48,7 @@ Options:
   --uconsole-signal       Like --uconsole, plus a 4G-signal widget in the bar
                           (reads a Huawei HiLink dongle's HTTP API).
   --modem-ip=IP           HiLink dongle address for the signal widget
-                          (default: 128.128.66.1).
+                          (default: 192.168.98.1).
   --rotate=DIR            uConsole panel rotation: right|left|normal|inverted|skip
                           (default: right).
   --yes                   Assume "yes"; do not prompt.
