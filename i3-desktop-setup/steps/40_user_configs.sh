@@ -36,23 +36,17 @@ log_info "i3 palette: $I3_PALETTE"
 ASSET_DIR="$TARGET_HOME/.local/share/i3-desktop-setup"
 run_as_user mkdir -p "$ASSET_DIR"
 case "$I3_PALETTE" in
-    tokyo_night)      WP_BG="#1a1b26"; WP_GRAD="#24283b" ;;
-    catppuccin_mocha) WP_BG="#1e1e2e"; WP_GRAD="#313244" ;;
-    gruvbox_dark)     WP_BG="#282828"; WP_GRAD="#3c3836" ;;
-    nord)             WP_BG="#2e3440"; WP_GRAD="#3b4252" ;;
-    *)                WP_BG="#1a1b26"; WP_GRAD="#24283b" ;;
+    tokyo_night)      WP_BG="#1a1b26" ;;
+    catppuccin_mocha) WP_BG="#1e1e2e" ;;
+    gruvbox_dark)     WP_BG="#282828" ;;
+    nord)             WP_BG="#2e3440" ;;
+    *)                WP_BG="#1a1b26" ;;
 esac
+# Solid colour as the fallback (used by set-wallpaper.sh if feh is unavailable).
 printf '%s\n' "$WP_BG" | run_as_user tee "$ASSET_DIR/wallpaper-color" >/dev/null
-if command -v convert >/dev/null 2>&1; then
-    if run_as_user convert -size 1920x1080 "gradient:${WP_GRAD}-${WP_BG}" \
-            "$ASSET_DIR/wallpaper.png" 2>/dev/null; then
-        log_info "Generated gradient wallpaper"
-    else
-        log_warn "Wallpaper generation failed; falling back to solid colour"
-    fi
-else
-    log_info "ImageMagick not present; using solid '$WP_BG' background"
-fi
+# Deploy the shipped futuristic wallpaper; set-wallpaper.sh shows it via feh.
+install_config "$CFG/wallpaper/futuristic.png" "$ASSET_DIR/wallpaper.png" 0644
+log_info "Futuristic wallpaper deployed"
 
 # --- XDG user dirs (~/Downloads etc. for the file manager) -----------------
 if command -v xdg-user-dirs-update >/dev/null 2>&1; then

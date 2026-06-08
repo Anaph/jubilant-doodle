@@ -1,6 +1,7 @@
-# i3blocks configuration — used by the uConsole bar when the 4G-signal widget
-# is enabled (--uconsole-signal). __ACCENT__ is replaced with the theme accent
-# colour at install time. (No pango markup, so SSIDs with special chars are safe.)
+# i3blocks configuration — uConsole bar with the 4G-signal widget
+# (--uconsole-signal). Status text uses the bar's bright statusline colour for
+# contrast; style comes from the themed bar background, accent separators and
+# the battery's level colour. No pango markup, so special chars in SSIDs are safe.
 
 separator=true
 separator_block_width=18
@@ -8,33 +9,27 @@ separator_block_width=18
 [modem]
 command=~/.config/i3blocks/scripts/4g-signal.sh
 interval=10
-color=__ACCENT__
 
 [wifi]
 command=~/.config/i3blocks/scripts/wifi.sh
 interval=15
-color=__ACCENT__
 
 [volume]
 command=~/.config/i3blocks/scripts/volume.sh
 interval=2
 signal=10
-color=__ACCENT__
 
 [disk]
 command=df -h --output=avail / | awk 'NR==2{gsub(/ /,"");print "DISK " $1}'
 interval=30
-color=__ACCENT__
 
 [memory]
 command=free -h | awk '/^Mem:/ {print "RAM " $3 "/" $2}'
 interval=10
-color=__ACCENT__
 
 [load]
 command=awk '{print "LOAD " $1}' /proc/loadavg
 interval=10
-color=__ACCENT__
 
 [battery]
 command=~/.config/i3blocks/scripts/battery.sh
@@ -43,4 +38,3 @@ interval=20
 [time]
 command=date '+%a %d %b  %H:%M'
 interval=5
-color=__ACCENT__

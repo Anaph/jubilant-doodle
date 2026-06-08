@@ -162,11 +162,11 @@ bar {
     colors {
         background $bg
         statusline $fg
-        separator  $fg_dim
+        separator  $accent
         #                  border   background  text
         focused_workspace  $accent  $accent     $bg
         active_workspace   $bg_alt  $bg_alt     $fg
-        inactive_workspace $bg      $bg         $fg_dim
+        inactive_workspace $bg_alt  $bg         $fg
         urgent_workspace   $urgent  $urgent     $bg
         binding_mode       $urgent  $urgent     $bg
     }
