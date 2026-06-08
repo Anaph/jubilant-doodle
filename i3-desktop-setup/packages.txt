@@ -21,6 +21,9 @@ suckless-tools             # dmenu (rofi fallback)
 dunst                      # notification daemon
 libnotify-bin              # notify-send for scripts/testing
 
+# --- Status bar generator ---
+i3blocks                   # blocks-based status line (battery, 4G, CPU graph, …)
+
 # --- Launcher + compositor + wallpaper ---
 rofi                       # application launcher (drun mode)
 picom                      # X11 compositor (xrender backend, Pi-safe)

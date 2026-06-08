@@ -1,0 +1,31 @@
+# i3blocks configuration. Blocks have no explicit colour, so they render in the
+# bar's bright statusline colour (set in the i3 `bar { colors }` block) — light
+# text on the hard-coded dark bar. Network status is shown by the nm-applet tray
+# icon, so there is no wifi block here.
+
+separator=true
+separator_block_width=16
+
+[4g]
+command=~/.config/i3blocks/scripts/4g-signal.sh
+interval=10
+
+[cpu]
+command=~/.config/i3blocks/scripts/cpu-graph.sh
+interval=2
+
+[disk]
+command=df -h --output=avail / | awk 'NR==2{gsub(/ /,"");print "DISK " $1}'
+interval=30
+
+[memory]
+command=free -h | awk '/^Mem:/ {print "RAM " $3 "/" $2}'
+interval=10
+
+[battery]
+command=~/.config/i3blocks/scripts/battery.sh
+interval=20
+
+[time]
+command=date '+%a %d %b  %H:%M'
+interval=5

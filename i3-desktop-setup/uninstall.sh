@@ -81,6 +81,10 @@ for f in \
     "$TARGET_HOME/.config/i3/scripts/polkit-agent.sh" \
     "$TARGET_HOME/.config/i3/scripts/uconsole.sh" \
     "$TARGET_HOME/.config/i3status/config" \
+    "$TARGET_HOME/.config/i3blocks/config" \
+    "$TARGET_HOME/.config/i3blocks/scripts/4g-signal.sh" \
+    "$TARGET_HOME/.config/i3blocks/scripts/cpu-graph.sh" \
+    "$TARGET_HOME/.config/i3blocks/scripts/battery.sh" \
     "$TARGET_HOME/.config/picom/picom.conf" \
     "$TARGET_HOME/.config/dunst/dunstrc" \
     "$TARGET_HOME/.config/rofi/config.rasi" \

@@ -73,16 +73,16 @@ sudo udevadm control --reload-rules 2>/dev/null || true
 
 # --- High-DPI font bumps for the 5"/720p panel -----------------------------
 ALA="$TARGET_HOME/.config/alacritty/alacritty.toml"
-[ -f "$ALA" ] && run_as_user sed -i -E 's|^size = .*|size = 14.0|' "$ALA"
+[ -f "$ALA" ] && run_as_user sed -i -E 's|^size = .*|size = 12.0|' "$ALA"
 I3CONF="$TARGET_HOME/.config/i3/config"
-[ -f "$I3CONF" ] && run_as_user sed -i -E 's|^font pango:Fira Code .*|font pango:Fira Code 12|' "$I3CONF"
+[ -f "$I3CONF" ] && run_as_user sed -i -E 's|^font pango:Fira Code .*|font pango:Fira Code 11|' "$I3CONF"
 DUN="$TARGET_HOME/.config/dunst/dunstrc"
-[ -f "$DUN" ] && run_as_user sed -i -E 's|^    font = Fira Code .*|    font = Fira Code 12|' "$DUN"
+[ -f "$DUN" ] && run_as_user sed -i -E 's|^    font = Fira Code .*|    font = Fira Code 11|' "$DUN"
 ROF="$TARGET_HOME/.config/rofi/config.rasi"
 if [ -f "$ROF" ] && ! run_as_user grep -q 'font:' "$ROF"; then
-    run_as_user sed -i 's|^configuration {|configuration {\n    font: "Fira Code 13";|' "$ROF"
+    run_as_user sed -i 's|^configuration {|configuration {\n    font: "Fira Code 11";|' "$ROF"
 fi
-log_info "Bumped fonts for the 720p panel"
+log_info "Bar/UI fonts sized for the 720p panel"
 
 # The status bar (i3status) is shared by all installs and already includes the
 # battery and the modem (shown as a network interface), so nothing to do here.

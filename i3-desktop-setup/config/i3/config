@@ -157,7 +157,7 @@ exec_always --no-startup-id test -x $HOME/.config/i3/scripts/uconsole.sh && $HOM
 
 # --- Status bar ------------------------------------------------------------
 bar {
-    status_command i3status
+    status_command i3blocks
     position top
     tray_output primary
     separator_symbol "  "

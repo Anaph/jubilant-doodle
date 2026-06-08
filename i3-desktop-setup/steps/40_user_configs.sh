@@ -14,6 +14,14 @@ install_config "$CFG/i3/scripts/set-wallpaper.sh" \
 install_config "$CFG/i3/scripts/polkit-agent.sh" \
                                            "$TARGET_HOME/.config/i3/scripts/polkit-agent.sh" 0755
 install_config "$CFG/i3status/config"      "$TARGET_HOME/.config/i3status/config"
+# Status bar generator (i3blocks): battery, 4G signal, CPU graph, disk, RAM, time.
+install_config "$CFG/i3blocks/config"      "$TARGET_HOME/.config/i3blocks/config"
+for _blk in 4g-signal cpu-graph battery; do
+    install_config "$CFG/i3blocks/scripts/${_blk}.sh" \
+                   "$TARGET_HOME/.config/i3blocks/scripts/${_blk}.sh" 0755
+done
+run_as_user sed -i -E "s|^MODEM_IP=.*|MODEM_IP=\"$MODEM_IP\"|" \
+    "$TARGET_HOME/.config/i3blocks/scripts/4g-signal.sh"
 install_config "$CFG/picom/picom.conf"     "$TARGET_HOME/.config/picom/picom.conf"
 install_config "$CFG/dunst/dunstrc"        "$TARGET_HOME/.config/dunst/dunstrc"
 install_config "$CFG/rofi/config.rasi"     "$TARGET_HOME/.config/rofi/config.rasi"
