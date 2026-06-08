@@ -47,5 +47,11 @@ cat <<'EOF'
 
 EOF
 
+# Apply immediately if an i3 session is already running, so config/bar changes
+# take effect without the user having to reload (Super+Shift+r) or re-login.
+if run_as_user env DISPLAY="${DISPLAY:-:0}" i3-msg restart >/dev/null 2>&1; then
+    log_info "Applied changes to the running i3 session (i3-msg restart)."
+fi
+
 log_info "Uninstall:  $REPO_DIR/uninstall.sh   (add --purge to also remove apt packages)"
 log_ok "Enjoy your i3 desktop!"

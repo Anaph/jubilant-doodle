@@ -16,7 +16,6 @@ CFG="$REPO_DIR/config"
 
 # --- Packages --------------------------------------------------------------
 UCON_PKGS=(bluez blueman usb-modeswitch usb-modeswitch-data tlp powertop zram-tools)
-[ "$UCONSOLE_SIGNAL" = 1 ] && UCON_PKGS+=(i3blocks curl)
 log_info "Installing uConsole packages: ${UCON_PKGS[*]}"
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${UCON_PKGS[@]}"
 
@@ -85,39 +84,8 @@ if [ -f "$ROF" ] && ! run_as_user grep -q 'font:' "$ROF"; then
 fi
 log_info "Bumped fonts for the 720p panel"
 
-# --- Status bar: 4G signal widget (i3blocks) or battery in i3status --------
-if [ "$UCONSOLE_SIGNAL" = 1 ]; then
-    install_config "$CFG/i3blocks/config" "$TARGET_HOME/.config/i3blocks/config"
-    for s in 4g-signal volume wifi battery; do
-        install_config "$CFG/i3blocks/scripts/$s.sh" \
-                       "$TARGET_HOME/.config/i3blocks/scripts/$s.sh" 0755
-    done
-    run_as_user sed -i -E "s|^MODEM_IP=.*|MODEM_IP=\"$MODEM_IP\"|" \
-        "$TARGET_HOME/.config/i3blocks/scripts/4g-signal.sh"
-    # Switch the bar generator from i3status to i3blocks.
-    run_as_user sed -i 's|status_command i3status|status_command i3blocks|' "$I3CONF"
-    log_ok "Bar: themed i3blocks with 4G-signal + battery (modem $MODEM_IP)"
-else
-    I3STATUS="$TARGET_HOME/.config/i3status/config"
-    if [ -f "$I3STATUS" ] && ! run_as_user grep -q '"battery 0"' "$I3STATUS"; then
-        bpath="/sys/class/power_supply/axp20x-battery/uevent"
-        for p in /sys/class/power_supply/*; do
-            [ -r "$p/type" ] || continue
-            [ "$(cat "$p/type" 2>/dev/null)" = "Battery" ] && { bpath="$p/uevent"; break; }
-        done
-        run_as_user tee -a "$I3STATUS" >/dev/null <<EOF
-
-order += "battery 0"
-battery 0 {
-    format = "bat %status %percentage"
-    path = "$bpath"
-    low_threshold = 15
-    integer_battery_capacity = true
-}
-EOF
-        log_ok "Added battery module to i3status (path: $bpath)"
-    fi
-fi
+# The status bar (i3status) is shared by all installs and already includes the
+# battery and the modem (shown as a network interface), so nothing to do here.
 
 log_info "uConsole tweaks done. Reminder: apply the firmware-level prerequisites"
 log_info "(ClockworkPi apt repo, /boot/firmware/config.txt overlays, CM5 EEPROM) — see README."

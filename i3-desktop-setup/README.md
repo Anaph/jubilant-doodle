@@ -122,23 +122,21 @@ export LIBGL_ALWAYS_SOFTWARE=1
 
 ## ClockworkPi uConsole (CM5)
 
-Для uConsole есть опциональный модуль с правками под железо. Установка с виджетом
-4G-сигнала и кастомным адресом донгла:
+Для uConsole есть опциональный модуль с правками под железо:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-desktop-setup/bootstrap.sh \
-  | bash -s -- --uconsole-signal --modem-ip=192.168.98.1
+  | bash -s -- --uconsole
 ```
 
-Флаги: `--uconsole` (без виджета), `--uconsole-signal` (с виджетом 4G),
-`--modem-ip=IP` (адрес HiLink-донгла, по умолч. `192.168.98.1`),
+Флаги: `--uconsole` (или алиас `--uconsole-signal`),
 `--rotate=right|left|normal|inverted|skip` (поворот панели, по умолч. `right`).
 
 **Что делает модуль (безопасная, десктопная часть):**
 - поворот DSI-панели в landscape — и **на экране входа LightDM**, и в сессии i3
   (автоопределение выхода `DSI-*`; меняется `--rotate`);
-- батарея (AXP228) в строке состояния; при `--uconsole-signal` — бар на **i3blocks**
-  с виджетом 4G-сигнала, читающим HTTP-API донгла;
+- батарея (AXP228) в строке состояния (стандартный **i3status**, читаемый светлый
+  текст на тёмном баре); 4G-донгл виден в баре как сетевое подключение (`NET <ip>`);
 - **Bluetooth** (`bluez` + `blueman`, апплет в трее);
 - **USB HiLink-модем** (Huawei E3372h): `usb-modeswitch` + udev-правило, чтобы
   ModemManager не перехватывал донгл (он подключается как обычная сетевая карта,

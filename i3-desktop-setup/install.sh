@@ -49,10 +49,8 @@ Options:
                           rotation, battery in the bar, Bluetooth, USB HiLink
                           modem support, power saving (tlp/zram), larger 720p
                           fonts.
-  --uconsole-signal       Like --uconsole, plus a 4G-signal widget in the bar
-                          (reads a Huawei HiLink dongle's HTTP API).
-  --modem-ip=IP           HiLink dongle address for the signal widget
-                          (default: 192.168.98.1).
+  --uconsole-signal       Alias for --uconsole (kept for compatibility). The 4G
+                          connection shows in the bar as a network interface.
   --rotate=DIR            uConsole panel rotation: right|left|normal|inverted|skip
                           (default: right).
   --extras                Install curated extra packages (cyberdeck, CLI/dev,

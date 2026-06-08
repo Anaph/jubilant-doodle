@@ -1,6 +1,6 @@
-# i3status configuration — managed by i3-desktop-setup.
-# Plain-text labels are used so the bar is readable with any installed font.
-# See `man i3status` for all modules and format options.
+# i3status configuration — the standard, always-readable i3 status bar.
+# Bright text on the themed dark bar (colours come from the i3 `bar { colors }`
+# block). Plain labels so it's legible with any font. See `man i3status`.
 
 general {
     colors = true
@@ -8,39 +8,55 @@ general {
     color_good     = "#9ece6a"
     color_degraded = "#e0af68"
     color_bad      = "#f7768e"
+    separator = "  "
 }
 
 order += "wireless _first_"
 order += "ethernet _first_"
+order += "battery all"
 order += "disk /"
 order += "memory"
 order += "load"
 order += "tztime local"
 
 wireless _first_ {
-    format_up   = "W: %essid (%quality)"
-    format_down = "W: down"
+    format_up   = "WIFI %essid (%quality)"
+    format_down = "WIFI down"
 }
 
+# The Huawei HiLink 4G dongle appears as a network interface, so this also
+# shows "online via modem" with its IP when connected.
 ethernet _first_ {
-    format_up   = "E: %ip"
-    format_down = "E: down"
+    format_up   = "NET %ip"
+    format_down = "NET down"
+}
+
+battery all {
+    format = "BAT %status %percentage"
+    format_down = ""
+    status_chr = "+"
+    status_bat = "-"
+    status_full = "="
+    last_full_capacity = true
+    low_threshold = 15
+    threshold_type = percentage
+    integer_battery_capacity = true
 }
 
 disk "/" {
-    format = "disk %avail"
+    format = "DISK %avail"
 }
 
 memory {
-    format = "mem %used"
+    format = "RAM %used"
     threshold_degraded = "10%"
-    format_degraded = "MEMORY < %available"
+    format_degraded = "RAM LOW %available"
 }
 
 load {
-    format = "load %1min"
+    format = "LOAD %1min"
 }
 
 tztime local {
-    format = "%Y-%m-%d %H:%M"
+    format = "%a %d %b  %H:%M"
 }

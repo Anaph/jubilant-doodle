@@ -81,11 +81,6 @@ for f in \
     "$TARGET_HOME/.config/i3/scripts/polkit-agent.sh" \
     "$TARGET_HOME/.config/i3/scripts/uconsole.sh" \
     "$TARGET_HOME/.config/i3status/config" \
-    "$TARGET_HOME/.config/i3blocks/config" \
-    "$TARGET_HOME/.config/i3blocks/scripts/4g-signal.sh" \
-    "$TARGET_HOME/.config/i3blocks/scripts/volume.sh" \
-    "$TARGET_HOME/.config/i3blocks/scripts/wifi.sh" \
-    "$TARGET_HOME/.config/i3blocks/scripts/battery.sh" \
     "$TARGET_HOME/.config/picom/picom.conf" \
     "$TARGET_HOME/.config/dunst/dunstrc" \
     "$TARGET_HOME/.config/rofi/config.rasi" \
@@ -149,7 +144,7 @@ if [ "$PURGE" = 1 ]; then
         done
         sudo DEBIAN_FRONTEND=noninteractive apt-get purge -y "${PKGS[@]}" \
             lightdm lightdm-gtk-greeter \
-            blueman bluez usb-modeswitch usb-modeswitch-data tlp powertop zram-tools i3blocks \
+            blueman bluez usb-modeswitch usb-modeswitch-data tlp powertop zram-tools \
             clang clangd clang-format clang-tidy cmake || true
         sudo DEBIAN_FRONTEND=noninteractive apt-get autoremove -y || true
         sudo systemctl set-default multi-user.target || true
