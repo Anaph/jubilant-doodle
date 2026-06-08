@@ -160,7 +160,6 @@ bar {
     status_command i3blocks
     position top
     tray_output primary
-    separator_symbol "  "
     # Explicit dark colours (Tokyo Night) — hard-coded so the bar is guaranteed
     # dark and readable even if the palette variables aren't loaded.
     colors {

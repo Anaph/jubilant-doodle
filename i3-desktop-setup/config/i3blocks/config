@@ -3,8 +3,8 @@
 # text on the hard-coded dark bar. Network status is shown by the nm-applet tray
 # icon, so there is no wifi block here.
 
-separator=true
-separator_block_width=16
+separator=false
+separator_block_width=22
 
 [4g]
 command=~/.config/i3blocks/scripts/4g-signal.sh
@@ -19,7 +19,7 @@ command=df -h --output=avail / | awk 'NR==2{gsub(/ /,"");print "DISK " $1}'
 interval=30
 
 [memory]
-command=free -h | awk '/^Mem:/ {print "RAM " $3 "/" $2}'
+command=free -h | awk '/^Mem:/ {print "RAM " $3}'
 interval=10
 
 [battery]
