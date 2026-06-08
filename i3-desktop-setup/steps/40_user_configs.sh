@@ -27,8 +27,18 @@ case "$THEME" in
     *) I3_PALETTE="tokyo_night"
        log_warn "No i3 palette for '$THEME'; theming i3 with tokyo_night." ;;
 esac
-install_config "$CFG/i3/colors/${I3_PALETTE}.conf" "$TARGET_HOME/.config/i3/colors.conf"
-log_info "i3 palette: $I3_PALETTE"
+# Inline the palette in place of the "# __PALETTE__" marker, so window colours do
+# NOT depend on i3's `include` directive (which may be unavailable/older i3).
+PALETTE_FILE="$CFG/i3/colors/${I3_PALETTE}.conf"
+I3DEST="$TARGET_HOME/.config/i3/config"
+i3tmp="$(mktemp)"
+awk -v pf="$PALETTE_FILE" '
+    /# __PALETTE__/ { while ((getline l < pf) > 0) print l; close(pf); next }
+    { print }
+' "$I3DEST" >"$i3tmp"
+cat "$i3tmp" >"$I3DEST"
+rm -f "$i3tmp"
+log_info "i3 palette inlined: $I3_PALETTE"
 
 # --- Wallpaper -------------------------------------------------------------
 # A solid colour (via xsetroot) always works; if ImageMagick happens to be

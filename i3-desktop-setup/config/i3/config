@@ -8,7 +8,9 @@
 set $mod Mod4
 
 # Theme palette: defines $bg/$fg/$accent/... and all client.* window colours.
-include ~/.config/i3/colors.conf
+# The installer inlines the chosen palette here (replacing the marker), so this
+# does NOT depend on i3's `include` directive working.
+# __PALETTE__
 
 # Fonts for window titles and the bar.
 font pango:Fira Code 10
@@ -159,15 +161,17 @@ bar {
     position top
     tray_output primary
     separator_symbol "  "
+    # Explicit dark colours (Tokyo Night) — hard-coded so the bar is guaranteed
+    # dark and readable even if the palette variables aren't loaded.
     colors {
-        background $bg
-        statusline $fg
-        separator  $accent
-        #                  border   background  text
-        focused_workspace  $accent  $accent     $bg
-        active_workspace   $bg_alt  $bg_alt     $fg
-        inactive_workspace $bg_alt  $bg         $fg
-        urgent_workspace   $urgent  $urgent     $bg
-        binding_mode       $urgent  $urgent     $bg
+        background #15161e
+        statusline #c0caf5
+        separator  #7aa2f7
+        #                  border    background  text
+        focused_workspace  #7aa2f7   #7aa2f7     #15161e
+        active_workspace   #292e42   #292e42     #c0caf5
+        inactive_workspace #292e42   #15161e     #a9b1d6
+        urgent_workspace   #f7768e   #f7768e     #15161e
+        binding_mode       #f7768e   #f7768e     #15161e
     }
 }
