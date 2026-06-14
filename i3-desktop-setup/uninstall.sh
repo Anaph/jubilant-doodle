@@ -130,11 +130,21 @@ if [ -f /etc/systemd/system/uconsole-cpufreq.service ] || \
     sudo systemctl enable bluetooth 2>/dev/null || true   # restore (we had disabled it)
 fi
 
+# aiov2_ctl (HackerGadgets AIO v2 tool), if we installed it.
+if [ -f /etc/systemd/system/aiov2-rails-boot.service ] || [ -f /usr/local/bin/aiov2_ctl ]; then
+    need_sudo
+    sudo systemctl disable --now aiov2-rails-boot.service 2>/dev/null || true
+    sudo rm -f /etc/systemd/system/aiov2-rails-boot.service /usr/local/bin/aiov2_ctl
+    log_info "Removed aiov2_ctl"
+fi
+rm -rf "$TARGET_HOME/.local/share/aiov2_ctl"
+
 # --- Undo uConsole system files --------------------------------------------
 for sysf in \
     /etc/udev/rules.d/99-huawei-hilink.rules \
     /etc/tlp.d/01-uconsole.conf \
     /etc/lightdm/lightdm.conf.d/10-uconsole-rotate.conf \
+    /etc/systemd/logind.conf.d/10-uconsole-powerkey.conf \
     /usr/local/bin/uconsole-rotate.sh \
     /usr/local/bin/uconsole-cpufreq \
     /etc/systemd/system/uconsole-cpufreq.service \

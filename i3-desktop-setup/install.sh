@@ -23,6 +23,7 @@ MINIMAL=0
 ASSUME_YES=0
 UCONSOLE=0                # ClockworkPi uConsole (CM5) hardware tweaks
 UCONSOLE_SIGNAL=0         # add a 4G-signal bar widget (Huawei HiLink dongle)
+AIO=0                     # install HackerGadgets AIO v2 control tool (aiov2_ctl)
 MODEM_IP="192.168.98.1"   # HiLink dongle web/API address
 ROTATE="right"            # uConsole panel rotation: right|left|normal|inverted|skip
 EXTRAS=0                  # install the curated extra package bundles
@@ -50,6 +51,9 @@ Options:
                           modem support, power saving (tlp/zram), larger 720p
                           fonts.
   --uconsole-signal       Alias for --uconsole (kept for compatibility).
+  --aio                   Also install the HackerGadgets AIO v2 control tool
+                          (aiov2_ctl: GPS/LoRa/SDR/USB toggles, power telemetry,
+                          tray GUI). Implies --uconsole.
   --modem-ip=IP           HiLink 4G dongle address for the bar's signal block
                           (default: 192.168.98.1).
   --rotate=DIR            uConsole panel rotation: right|left|normal|inverted|skip
@@ -75,6 +79,7 @@ for arg in "$@"; do
         --minimal)   MINIMAL=1 ;;
         --uconsole)  UCONSOLE=1 ;;
         --uconsole-signal) UCONSOLE=1; UCONSOLE_SIGNAL=1 ;;
+        --aio)       UCONSOLE=1; AIO=1 ;;
         --modem-ip=*) MODEM_IP="${arg#*=}" ;;
         --rotate=*)  ROTATE="${arg#*=}" ;;
         --extras)    EXTRAS=1; NEOVIM=1 ;;
@@ -104,7 +109,7 @@ TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 [ -n "$TARGET_HOME" ] || TARGET_HOME="$HOME"
 export TARGET_USER TARGET_HOME
 export BOOT_METHOD THEME INSTALL_CLAUDE MINIMAL ASSUME_YES
-export UCONSOLE UCONSOLE_SIGNAL MODEM_IP ROTATE
+export UCONSOLE UCONSOLE_SIGNAL AIO MODEM_IP ROTATE
 export EXTRAS NEOVIM NVCHAD_REPO
 
 # --- Load helpers ----------------------------------------------------------

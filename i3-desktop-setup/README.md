@@ -148,8 +148,18 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
     `/usr/local/bin/uconsole-cpufreq` — можно `powersave` или потолок частоты);
   - **Bluetooth выключен** по умолчанию (`rfkill` + сервис), `bluez`/`blueman`
     остаются — включить: `sudo rfkill unblock bluetooth && sudo systemctl start bluetooth`;
+  - **кнопка питания**: короткое нажатие → «сон» (гашение подсветки + блокировка,
+    через `systemd-logind HandlePowerKey=lock`), долгое → выключение
+    (`HandlePowerKeyLongPress=poweroff`). Действует после перезагрузки;
   - `tlp` (USB-autosuspend off, чтобы не отрубать донгл), `zram`, `powertop`;
 - увеличенные шрифты под 5″/720p.
+
+**AIO v2 (HackerGadgets) — флаг `--aio`.** Ставит клиент **`aiov2_ctl`** (из
+исходников `github.com/hackergadgets/aiov2_ctl`): тумблеры GPS/LoRa/SDR/USB,
+телеметрия питания, GUI-трей (автозапуск в i3), CLI (`aiov2_ctl --status`,
+`aiov2_ctl <FEATURE> on|off`). Базовый пакет платы
+`hackergadgets-uconsole-aio-board` (GPIO/rails/RTC/`pinctrl`) — предпосылка,
+ставится из apt-репозитория HackerGadgets.
 
 **Энергосбережение вручную** (firmware/железо — не автоматизирую):
 - андерклок в `/boot/firmware/config.txt` — умеренно `arm_freq=1800 gpu_freq=500`,

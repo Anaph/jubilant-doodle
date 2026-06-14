@@ -52,6 +52,16 @@ EOF
 sudo systemctl enable uconsole-cpufreq.service 2>/dev/null || true
 sudo systemctl start uconsole-cpufreq.service 2>/dev/null || true
 
+# Power button: a short press locks (xss-lock blanks the backlight = "sleep"); a
+# long press powers off. Requires the power button to emit KEY_POWER (it does on
+# the stock/AIO uConsole). Takes effect after a reboot.
+sudo install -d -m 0755 /etc/systemd/logind.conf.d
+sudo tee /etc/systemd/logind.conf.d/10-uconsole-powerkey.conf >/dev/null <<'EOF'
+[Login]
+HandlePowerKey=lock
+HandlePowerKeyLongPress=poweroff
+EOF
+
 # tlp for battery life; but never autosuspend USB (would drop the LTE dongle,
 # keyboard or other peripherals).
 sudo install -d -m 0755 /etc/tlp.d
@@ -116,6 +126,22 @@ log_info "Bar/UI fonts sized for the 720p panel"
 
 # The status bar (i3status) is shared by all installs and already includes the
 # battery and the modem (shown as a network interface), so nothing to do here.
+
+# --- HackerGadgets AIO v2 control tool (aiov2_ctl) --------------------------
+if [ "${AIO:-0}" = 1 ]; then
+    log_info "Installing AIO v2 control tool (aiov2_ctl)"
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-pyqt6 git \
+        || log_warn "Could not install aiov2_ctl dependencies"
+    AIO_DIR="$TARGET_HOME/.local/share/aiov2_ctl"
+    git_clone_idempotent "https://github.com/hackergadgets/aiov2_ctl.git" "$AIO_DIR"
+    if [ -f "$AIO_DIR/aiov2_ctl.py" ] && sudo python3 "$AIO_DIR/aiov2_ctl.py" --install; then
+        log_ok "aiov2_ctl installed (tray GUI autostarts in i3; CLI e.g. 'aiov2_ctl --status')"
+    else
+        log_warn "aiov2_ctl install failed; run 'sudo python3 $AIO_DIR/aiov2_ctl.py --install' manually"
+    fi
+    log_info "AIO core package 'hackergadgets-uconsole-aio-board' (GPIO/rails/RTC/pinctrl) is a"
+    log_info "prerequisite — install it from the HackerGadgets apt repo if you haven't already."
+fi
 
 log_info "uConsole tweaks done. Reminder: apply the firmware-level prerequisites"
 log_info "(ClockworkPi apt repo, /boot/firmware/config.txt overlays, CM5 EEPROM) — see README."

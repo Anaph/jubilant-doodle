@@ -24,11 +24,19 @@ if command -v xset >/dev/null 2>&1; then
     xset s 300 300 2>/dev/null || true     # screensaver after 5 min
     xset dpms 0 0 300 2>/dev/null || true   # display off after 5 min idle
 fi
+# The locker also forces the backlight off, so a short power-button press
+# (logind HandlePowerKey=lock) acts as "sleep": screen off + locked.
 if command -v xss-lock >/dev/null 2>&1; then
-    pgrep -x xss-lock >/dev/null 2>&1 || xss-lock -- i3lock -c 15161e &
+    pgrep -x xss-lock >/dev/null 2>&1 || \
+        xss-lock -- sh -c 'xset dpms force off; exec i3lock -n -c 15161e' &
 fi
 
 # --- Bluetooth tray applet -------------------------------------------------
 if command -v blueman-applet >/dev/null 2>&1; then
     pgrep -x blueman-applet >/dev/null 2>&1 || blueman-applet &
+fi
+
+# --- AIO v2 control tray (HackerGadgets), if installed ---------------------
+if command -v aiov2_ctl >/dev/null 2>&1; then
+    pgrep -f 'aiov2_ctl .*--gui' >/dev/null 2>&1 || aiov2_ctl --gui &
 fi
