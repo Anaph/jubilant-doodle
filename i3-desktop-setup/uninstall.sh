@@ -121,6 +121,19 @@ if [ -f "$AUTOLOGIN_DROPIN" ]; then
     log_info "Removed tty1 autologin drop-in"
 fi
 
+# --- Undo LightDM greeter theming ------------------------------------------
+if [ -f /etc/lightdm/lightdm.conf.d/20-uconsole-greeter.conf ] \
+   || [ -f /etc/lightdm/lightdm-gtk-greeter.conf.i3ds.bak ]; then
+    need_sudo
+    sudo rm -f /etc/lightdm/lightdm.conf.d/20-uconsole-greeter.conf \
+        /usr/share/backgrounds/uconsole-futuristic.png
+    if [ -f /etc/lightdm/lightdm-gtk-greeter.conf.i3ds.bak ]; then
+        sudo mv /etc/lightdm/lightdm-gtk-greeter.conf.i3ds.bak \
+            /etc/lightdm/lightdm-gtk-greeter.conf
+    fi
+    log_info "Reverted LightDM greeter theming"
+fi
+
 # --- Undo uConsole power-saving services + Bluetooth state -----------------
 if [ -f /etc/systemd/system/uconsole-cpufreq.service ] || \
    [ -f /etc/systemd/system/uconsole-rfkill-bt.service ]; then

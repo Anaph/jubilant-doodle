@@ -12,12 +12,40 @@ AUTOLOGIN_DROPIN="/etc/systemd/system/getty@tty1.service.d/override.conf"
 
 if [ "$BOOT_METHOD" = "lightdm" ]; then
     log_info "Installing LightDM display manager"
-    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y lightdm lightdm-gtk-greeter
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        lightdm lightdm-gtk-greeter arc-theme papirus-icon-theme
     sudo systemctl enable lightdm
     sudo systemctl set-default graphical.target
-    # The i3 session entry ships with i3-wm at /usr/share/xsessions/i3.desktop,
-    # so LightDM will offer "i3" automatically.
-    log_ok "LightDM enabled; the i3 session will be available at the login screen."
+
+    # Force the GTK greeter (some Pi/uConsole images default to pi-greeter, which
+    # ignores lightdm-gtk-greeter.conf and stays unstyled).
+    sudo install -d -m 0755 /etc/lightdm/lightdm.conf.d
+    sudo tee /etc/lightdm/lightdm.conf.d/20-uconsole-greeter.conf >/dev/null <<'EOF'
+[Seat:*]
+greeter-session=lightdm-gtk-greeter
+EOF
+
+    # Theme the greeter to match the desktop: dark theme, Papirus icons and the
+    # synthwave wallpaper (copied to a system path the lightdm user can read).
+    sudo install -D -m 0644 "$REPO_DIR/config/wallpaper/futuristic.png" \
+        /usr/share/backgrounds/uconsole-futuristic.png
+    sudo cp -n /etc/lightdm/lightdm-gtk-greeter.conf \
+        /etc/lightdm/lightdm-gtk-greeter.conf.i3ds.bak 2>/dev/null || true
+    sudo tee /etc/lightdm/lightdm-gtk-greeter.conf >/dev/null <<'EOF'
+[greeter]
+background = /usr/share/backgrounds/uconsole-futuristic.png
+theme-name = Arc-Dark
+icon-theme-name = Papirus-Dark
+font-name = Fira Code 11
+xft-antialias = true
+xft-hintstyle = hintslight
+indicators = ~spacer;~clock;~spacer;~session;~power
+clock-format = %H:%M
+position = 50%,center 55%,center
+hide-user-image = true
+EOF
+
+    log_ok "LightDM enabled + greeter themed (Arc-Dark, synthwave background)."
 else
     log_info "Configuring console autologin + startx on tty1"
     # systemd drop-in: log the target user in automatically on tty1.

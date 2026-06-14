@@ -24,7 +24,9 @@
 curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-desktop-setup/bootstrap.sh | bash
 ```
 
-По умолчанию: вход через **LightDM**, тема **Tokyo Night**, с установкой Claude Code.
+По умолчанию: вход через **LightDM** (экран входа оформлен в тёмную тему Arc-Dark
+с иконками Papirus и synthwave-обоями; принудительно включается `lightdm-gtk-greeter`,
+если в образе стоял другой), тема **Tokyo Night**, с установкой Claude Code.
 
 ### С опциями
 
