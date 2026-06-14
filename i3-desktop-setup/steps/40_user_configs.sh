@@ -16,7 +16,7 @@ install_config "$CFG/i3/scripts/polkit-agent.sh" \
 install_config "$CFG/i3status/config"      "$TARGET_HOME/.config/i3status/config"
 # Status bar generator (i3blocks): battery, 4G signal, CPU graph, disk, RAM, time.
 install_config "$CFG/i3blocks/config"      "$TARGET_HOME/.config/i3blocks/config"
-for _blk in 4g-signal cpu-graph battery; do
+for _blk in 4g-signal cpu-graph battery power-watts; do
     install_config "$CFG/i3blocks/scripts/${_blk}.sh" \
                    "$TARGET_HOME/.config/i3blocks/scripts/${_blk}.sh" 0755
 done

@@ -21,6 +21,8 @@ if [ -s "$STATE" ]; then
     sudo -n /usr/local/bin/uconsole-powersave wake >/dev/null 2>&1
 else
     # ---- SLEEP ----
+    # Lock first (i3lock keeps running through wake; the user types to unlock).
+    has i3lock && { pgrep -x i3lock >/dev/null 2>&1 || i3lock -n -c 15161e & }
     if has brightnessctl; then brightnessctl get 2>/dev/null >"$STATE"; fi
     [ -s "$STATE" ] || echo 50% >"$STATE"
     sudo -n /usr/local/bin/uconsole-powersave sleep >/dev/null 2>&1

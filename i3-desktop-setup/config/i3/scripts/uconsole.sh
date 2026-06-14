@@ -21,6 +21,11 @@ fi
 # toggles the backlight via brightnessctl — DPMS does not power the DSI panel.
 command -v brightnessctl >/dev/null 2>&1 && brightnessctl set 60% >/dev/null 2>&1
 
+# Power-button sleep daemon (reads raw input, so wake works through i3lock's grab).
+if command -v uconsole-powerd >/dev/null 2>&1; then
+    pgrep -f uconsole-powerd >/dev/null 2>&1 || uconsole-powerd &
+fi
+
 # --- Bluetooth tray applet -------------------------------------------------
 if command -v blueman-applet >/dev/null 2>&1; then
     pgrep -x blueman-applet >/dev/null 2>&1 || blueman-applet &
