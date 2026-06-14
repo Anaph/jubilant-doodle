@@ -5,6 +5,16 @@
 --
 -- __NVCHAD_REPO__ is replaced at install time with the configured NvChad core.
 
+-- Auto-open the file tree (nvim-tree) on startup, keeping focus in the editor.
+vim.api.nvim_create_autocmd("VimEnter", {
+  callback = function()
+    vim.schedule(function()
+      pcall(vim.cmd, "NvimTreeOpen")
+      pcall(vim.cmd, "wincmd p")
+    end)
+  end,
+})
+
 -- Start clangd (C/C++) once, without clobbering NvChad's own lspconfig wiring.
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "c", "cpp", "objc", "objcpp", "cuda" },

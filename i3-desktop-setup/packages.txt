@@ -36,6 +36,7 @@ alacritty                  # GPU terminal (primary)
 firefox-esr                # default browser (registers x-www-browser)
 
 # --- Fonts ---
+fontconfig                 # fc-cache/fc-list (needed to install the Nerd Font)
 fonts-dejavu               # baseline UI/mono coverage
 fonts-firacode             # programming font for Alacritty / i3 bar
 fonts-noto-color-emoji     # emoji glyphs

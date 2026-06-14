@@ -244,8 +244,13 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
   - **C/C++** — LSP `clangd` и форматтер **clang-format** через conform;
   - **CMake** — `cmake-tools.nvim` (configure/build/run) и опц. LSP
     `cmake-language-server` (ставится через pipx, если он есть);
-  - парсеры treesitter для c/cpp/cmake/make.
+  - парсеры treesitter для c/cpp/cmake/make;
+  - **дерево файлов (nvim-tree) открывается автоматически** при старте nvim.
 - ставит тулчейн: `clang clangd clang-format clang-tidy cmake ripgrep fd-find`.
+
+Иконки/глифы NvChad требуют **Nerd Font** — установщик ставит **FiraCode Nerd
+Font** (в `~/.local/share/fonts`) и переключает на него Alacritty (тот же вид
+Fira Code + глифы). Без него часть символов в nvim — «квадратики».
 
 Плагины подтянутся при **первом запуске** `nvim` (lazy.nvim). Можно заранее:
 ```bash
