@@ -52,12 +52,20 @@ EOF
 sudo systemctl enable uconsole-cpufreq.service 2>/dev/null || true
 sudo systemctl start uconsole-cpufreq.service 2>/dev/null || true
 
-# Power button: a short press toggles the backlight ("sleep") — i3 binds
-# XF86PowerOff to uconsole-bl-toggle; a long press powers off. logind ignores
-# the short press so the key reaches i3. Toggling the backlight via brightnessctl
-# needs the user in the "video" group. Takes effect after a reboot.
-sudo install -D -m 0755 "$CFG/uconsole/bl-toggle.sh" /usr/local/bin/uconsole-bl-toggle
+# Power button: a short press runs the deep power-saving "sleep" (i3 binds
+# XF86PowerOff -> uconsole-sleep); a long press powers off. logind ignores the
+# short press so it reaches i3. Backlight needs the user in the "video" group;
+# the privileged parts (governor, radios, network) run via a narrow sudo
+# NOPASSWD on the root-owned uconsole-powersave. Takes effect after a reboot.
+sudo rm -f /usr/local/bin/uconsole-bl-toggle   # superseded by uconsole-sleep
+sudo install -D -m 0755 "$CFG/uconsole/sleep.sh"     /usr/local/bin/uconsole-sleep
+sudo install -D -m 0755 "$CFG/uconsole/powersave.sh" /usr/local/bin/uconsole-powersave
 sudo usermod -aG video "$TARGET_USER" 2>/dev/null || true
+printf '%s ALL=(root) NOPASSWD: /usr/local/bin/uconsole-powersave\n' "$TARGET_USER" \
+    | sudo tee /etc/sudoers.d/010-uconsole-powersave >/dev/null
+sudo chmod 0440 /etc/sudoers.d/010-uconsole-powersave
+sudo visudo -cf /etc/sudoers.d/010-uconsole-powersave >/dev/null 2>&1 \
+    || { log_warn "sudoers drop-in invalid; removing it"; sudo rm -f /etc/sudoers.d/010-uconsole-powersave; }
 sudo install -d -m 0755 /etc/systemd/logind.conf.d
 sudo tee /etc/systemd/logind.conf.d/10-uconsole-powerkey.conf >/dev/null <<'EOF'
 [Login]

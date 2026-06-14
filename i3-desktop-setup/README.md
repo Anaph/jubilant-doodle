@@ -142,10 +142,12 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
   ModemManager не перехватывал донгл (он подключается как обычная сетевая карта,
   NetworkManager поднимает DHCP сам);
 - **энергосбережение** (подсветка — главный потребитель):
-  - **кнопка питания → «сон»**: короткое нажатие гасит подсветку (бинд
-    `XF86PowerOff` в i3 → `uconsole-bl-toggle` через `brightnessctl`), повторное
-    нажатие — будит. DPMS на DSI-панели подсветку не гасит, поэтому используется
-    `brightnessctl`. Долгое нажатие → выключение (`HandlePowerKeyLongPress`);
+  - **кнопка питания → глубокий «сон»** (не suspend — CM5 его не умеет надёжно;
+    система не замораживается, поэтому **просыпается мгновенно**): короткое нажатие →
+    подсветка off + CPU `powersave` + Wi-Fi/сеть off + (AIO) USB-рейл off; повторное
+    нажатие восстанавливает. Бинд `XF86PowerOff` → `uconsole-sleep`; привилегии
+    (governor/rfkill/network) — через узкий `sudo NOPASSWD` на `uconsole-powersave`.
+    Долгое нажатие → выключение;
   - стартовая **яркость 60%** (клавиши яркости `XF86MonBrightness*` забиндены);
   - **CPU governor** `schedutil` закреплён сервисом `uconsole-cpufreq` (правится в
     `/usr/local/bin/uconsole-cpufreq` — можно `powersave` или потолок частоты);
@@ -156,8 +158,10 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 
 > Сон по кнопке начинает работать **после перезагрузки** (logind перечитывает
 > конфиг на старте) и нужен пользователь в группе `video` (добавляется
-> установщиком). Блокировки при «сне» нет — это переключатель подсветки; если
-> нужна блокировка-при-сне, скажи (сделаю отдельным демоном кнопки).
+> установщиком). В «сне» рвётся Wi-Fi/4G (так выбрано — максимум экономии);
+> блокировки экрана при сне нет (сессия активна под погашенной подсветкой).
+> Настоящего `systemctl suspend` (s2idle) на CM5 нет — он часто не просыпается,
+> поэтому не используется.
 
 **AIO v2 (HackerGadgets) — флаг `--aio`.** Ставит **базовый пакет платы**
 `hackergadgets-uconsole-aio-board` (GPIO/rails/RTC/`pinctrl`; если его apt-репо
