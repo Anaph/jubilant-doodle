@@ -140,6 +140,26 @@ log_info "Bar/UI fonts sized for the 720p panel"
 # The status bar (i3status) is shared by all installs and already includes the
 # battery and the modem (shown as a network interface), so nothing to do here.
 
+# --- CPU underclock via config.txt (--underclock) --------------------------
+if [ -n "${UNDERCLOCK:-}" ]; then
+    case "$UNDERCLOCK" in
+        aggressive) AF=1200; AFM=600 ;;
+        moderate|*) AF=1800; AFM=1000 ;;
+    esac
+    CFGTXT=/boot/firmware/config.txt
+    [ -f "$CFGTXT" ] || CFGTXT=/boot/config.txt
+    if [ -f "$CFGTXT" ]; then
+        sudo cp -n "$CFGTXT" "$CFGTXT.i3ds.bak" 2>/dev/null || true
+        # Replace any previous block, then append a fresh one under [all].
+        sudo sed -i '/# >>> i3ds-underclock >>>/,/# <<< i3ds-underclock <<</d' "$CFGTXT"
+        printf '# >>> i3ds-underclock >>>\n[all]\narm_freq=%s\narm_freq_min=%s\n# <<< i3ds-underclock <<<\n' \
+            "$AF" "$AFM" | sudo tee -a "$CFGTXT" >/dev/null
+        log_ok "Underclock ($UNDERCLOCK): arm_freq=$AF arm_freq_min=$AFM in $CFGTXT — reboot to apply"
+    else
+        log_warn "config.txt not found — skipping underclock (not a Pi firmware layout?)"
+    fi
+fi
+
 # --- HackerGadgets AIO v2 control tool (aiov2_ctl) --------------------------
 if [ "${AIO:-0}" = 1 ]; then
     log_info "Installing AIO v2 board package + control tool"

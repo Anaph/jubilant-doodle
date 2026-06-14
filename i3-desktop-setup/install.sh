@@ -26,6 +26,7 @@ UCONSOLE_SIGNAL=0         # add a 4G-signal bar widget (Huawei HiLink dongle)
 AIO=0                     # install HackerGadgets AIO v2 control tool (aiov2_ctl)
 MODEM_IP="192.168.98.1"   # HiLink dongle web/API address
 ROTATE="right"            # uConsole panel rotation: right|left|normal|inverted|skip
+UNDERCLOCK=""             # ""|moderate|aggressive — underclock via config.txt
 EXTRAS=0                  # install the curated extra package bundles
 NEOVIM=0                  # set up Neovim + NvChad (implied by --extras)
 NO_NVIM=0                 # with --extras, opt out of the Neovim setup
@@ -58,6 +59,8 @@ Options:
                           (default: 192.168.98.1).
   --rotate=DIR            uConsole panel rotation: right|left|normal|inverted|skip
                           (default: right).
+  --underclock[=PROFILE]  Underclock via /boot/firmware/config.txt for battery.
+                          PROFILE: moderate (default) or aggressive. Needs reboot.
   --extras                Install curated extra packages (cyberdeck, CLI/dev,
                           network) and set up Neovim + NvChad.
   --neovim                Set up Neovim + NvChad only (implied by --extras).
@@ -82,6 +85,8 @@ for arg in "$@"; do
         --aio)       UCONSOLE=1; AIO=1 ;;
         --modem-ip=*) MODEM_IP="${arg#*=}" ;;
         --rotate=*)  ROTATE="${arg#*=}" ;;
+        --underclock) UNDERCLOCK=moderate ;;
+        --underclock=*) UNDERCLOCK="${arg#*=}" ;;
         --extras)    EXTRAS=1; NEOVIM=1 ;;
         --neovim)    NEOVIM=1 ;;
         --no-nvim)   NO_NVIM=1 ;;
@@ -109,7 +114,7 @@ TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 [ -n "$TARGET_HOME" ] || TARGET_HOME="$HOME"
 export TARGET_USER TARGET_HOME
 export BOOT_METHOD THEME INSTALL_CLAUDE MINIMAL ASSUME_YES
-export UCONSOLE UCONSOLE_SIGNAL AIO MODEM_IP ROTATE
+export UCONSOLE UCONSOLE_SIGNAL AIO MODEM_IP ROTATE UNDERCLOCK
 export EXTRAS NEOVIM NVCHAD_REPO
 
 # --- Load helpers ----------------------------------------------------------

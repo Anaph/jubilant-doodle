@@ -151,8 +151,9 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
     захват клавиатуры i3lock); привилегии — через `sudo NOPASSWD` на
     `uconsole-powersave`. Долгое нажатие → выключение;
   - стартовая **яркость 60%** (клавиши яркости `XF86MonBrightness*` забиндены);
-  - **CPU governor** `schedutil` закреплён сервисом `uconsole-cpufreq` (правится в
-    `/usr/local/bin/uconsole-cpufreq` — можно `powersave` или потолок частоты);
+  - **CPU governor** по умолчанию **`powersave`** (минимальная частота → максимум
+    автономности, но устройство небыстрое) — сервис `uconsole-cpufreq`; для скорости
+    смени на `schedutil` в `/usr/local/bin/uconsole-cpufreq`;
   - **Bluetooth выключен** по умолчанию (`rfkill` + сервис), `bluez`/`blueman`
     остаются — включить: `sudo rfkill unblock bluetooth && sudo systemctl start bluetooth`;
   - `tlp` (USB-autosuspend off, чтобы не отрубать донгл), `zram`, `powertop`;
@@ -170,12 +171,14 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 питания, GUI-трей (автозапуск в i3), CLI (`aiov2_ctl --status`,
 `aiov2_ctl <FEATURE> on|off`).
 
-**Энергосбережение вручную** (firmware/железо — не автоматизирую):
-- андерклок в `/boot/firmware/config.txt` — умеренно `arm_freq=1800 gpu_freq=500`,
-  агрессивно `arm_freq=1000 arm_freq_min=500`;
-- калибровка индикатора батареи:
-  `echo 1 | sudo tee /sys/class/power_supply/axp20x-battery/calibrate`, затем
-  полный разряд→заряд.
+**Андерклок — флаг `--underclock[=moderate|aggressive]`** (правит
+`/boot/firmware/config.txt`, блок с маркером + бэкап `*.i3ds.bak`, действует после
+перезагрузки): `moderate` = `arm_freq=1800 arm_freq_min=1000`, `aggressive` =
+`arm_freq=1200 arm_freq_min=600`. С governor `powersave` устройство держит
+`arm_freq_min`, поэтому именно он задаёт повседневную частоту и экономию.
+
+**Калибровка батареи вручную**: `echo 1 | sudo tee
+/sys/class/power_supply/axp20x-battery/calibrate`, затем полный разряд→заряд.
 
 **4G-донгл E3372h-153 (HiLink).** Это не serial-модем, а USB-сетевая карта:
 воткнул → `usb0`/`enx…` → NetworkManager даёт DHCP. APN/PIN/сигнал настраиваются в

@@ -1,10 +1,9 @@
 #!/bin/sh
 # uConsole CPU governor (run at boot by uconsole-cpufreq.service).
-# schedutil scales frequency with load — the efficient default. For maximum
-# battery set GOV=powersave; to cap peak power, also write a scaling_max_freq
-# below cpuinfo_max_freq in the loop below.
+# powersave pins the CPU to its lowest frequency for maximum battery life. For a
+# snappier device set GOV=schedutil (scales with load) or ondemand.
 
-GOV=schedutil
+GOV=powersave
 
 for d in /sys/devices/system/cpu/cpu*/cpufreq; do
     [ -w "$d/scaling_governor" ] && echo "$GOV" >"$d/scaling_governor"

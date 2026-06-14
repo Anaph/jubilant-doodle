@@ -162,6 +162,15 @@ for sysf in \
 done
 sudo systemctl daemon-reload 2>/dev/null || true
 
+# Remove the underclock block from config.txt (if we added it).
+for cfg in /boot/firmware/config.txt /boot/config.txt; do
+    if [ -f "$cfg" ] && grep -q 'i3ds-underclock' "$cfg"; then
+        need_sudo
+        sudo sed -i '/# >>> i3ds-underclock >>>/,/# <<< i3ds-underclock <<</d' "$cfg"
+        log_info "Removed underclock block from $cfg"
+    fi
+done
+
 # --- Optional: purge packages ----------------------------------------------
 if [ "$PURGE" = 1 ]; then
     if confirm "apt-purge ALL packages from packages.txt (this removes Xorg, i3, etc.)?"; then

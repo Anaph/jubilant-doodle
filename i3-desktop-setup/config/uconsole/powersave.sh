@@ -17,7 +17,7 @@ case "$1" in
         nmcli networking off 2>/dev/null
         ;;
     wake)
-        gov schedutil
+        gov powersave
         rfkill unblock wifi 2>/dev/null
         nmcli networking on 2>/dev/null
         ;;
