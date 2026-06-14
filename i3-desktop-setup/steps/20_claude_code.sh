@@ -19,6 +19,16 @@ claude_works() {
     run_as_user env PATH="$TARGET_HOME/.local/bin:$PATH" claude --version >/tmp/claude_ver 2>/dev/null
 }
 
+# Already installed and working? Skip the (slow) re-install on every run — Claude
+# Code updates itself, so there's nothing to do. Pass --reinstall-claude to force.
+if [ "${REINSTALL_CLAUDE:-0}" != 1 ] && claude_works; then
+    log_ok "Claude Code already installed: $(cat /tmp/claude_ver) — skipping (it self-updates)"
+    append_once "$TARGET_HOME/.profile" "$PATH_LINE"
+    append_once "$TARGET_HOME/.bashrc"  "$PATH_LINE"
+    rm -f /tmp/claude_ver
+    return 0
+fi
+
 # 1) Official native installer (recommended): standalone binary, no Node.js,
 #    supports arm64, lands in ~/.local/bin/claude. Run AS THE TARGET USER.
 log_info "Installing Claude Code via the official installer (as $TARGET_USER)"

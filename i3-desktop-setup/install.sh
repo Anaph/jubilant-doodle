@@ -19,6 +19,7 @@ export REPO_DIR
 BOOT_METHOD="lightdm"     # lightdm | startx
 THEME="tokyo_night"       # any alacritty-theme name; curated palettes also theme i3
 INSTALL_CLAUDE=1
+REINSTALL_CLAUDE=0        # force re-running the Claude Code installer
 MINIMAL=0
 ASSUME_YES=0
 UCONSOLE=0                # ClockworkPi uConsole (CM5) hardware tweaks
@@ -46,6 +47,8 @@ Options:
                           curated names tokyo_night, catppuccin_mocha,
                           gruvbox_dark and nord also theme i3 itself.
   --no-claude             Skip installing Claude Code.
+  --reinstall-claude      Re-run the Claude Code installer even if it's already
+                          installed (otherwise it's skipped — it self-updates).
   --minimal               Skip the extra "nice-to-have" desktop glue.
   --uconsole              Apply ClockworkPi uConsole (CM5) tweaks: screen
                           rotation, battery in the bar, Bluetooth, USB HiLink
@@ -79,6 +82,7 @@ for arg in "$@"; do
         --boot=*)  BOOT_METHOD="${arg#*=}" ;;
         --theme=*) THEME="${arg#*=}" ;;
         --no-claude) INSTALL_CLAUDE=0 ;;
+        --reinstall-claude) REINSTALL_CLAUDE=1 ;;
         --minimal)   MINIMAL=1 ;;
         --uconsole)  UCONSOLE=1 ;;
         --uconsole-signal) UCONSOLE=1; UCONSOLE_SIGNAL=1 ;;
@@ -113,7 +117,7 @@ TARGET_USER="$(id -un)"
 TARGET_HOME="$(getent passwd "$TARGET_USER" | cut -d: -f6)"
 [ -n "$TARGET_HOME" ] || TARGET_HOME="$HOME"
 export TARGET_USER TARGET_HOME
-export BOOT_METHOD THEME INSTALL_CLAUDE MINIMAL ASSUME_YES
+export BOOT_METHOD THEME INSTALL_CLAUDE REINSTALL_CLAUDE MINIMAL ASSUME_YES
 export UCONSOLE UCONSOLE_SIGNAL AIO MODEM_IP ROTATE UNDERCLOCK
 export EXTRAS NEOVIM NVCHAD_REPO
 
