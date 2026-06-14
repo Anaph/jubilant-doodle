@@ -151,6 +151,7 @@ for sysf in \
     /usr/local/bin/uconsole-sleep \
     /usr/local/bin/uconsole-powersave \
     /usr/local/bin/uconsole-powerd \
+    /usr/local/bin/uconsole-idle-dim \
     /etc/sudoers.d/010-uconsole-powersave \
     /etc/systemd/system/uconsole-cpufreq.service \
     /etc/systemd/system/uconsole-rfkill-bt.service; do

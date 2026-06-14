@@ -150,7 +150,9 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
     **`uconsole-powerd`** (читает `/dev/input` напрямую, поэтому работает сквозь
     захват клавиатуры i3lock); привилегии — через `sudo NOPASSWD` на
     `uconsole-powersave`. Долгое нажатие → выключение;
-  - стартовая **яркость 60%** (клавиши яркости `XF86MonBrightness*` забиндены);
+  - стартовая **яркость 60%** (клавиши `XF86MonBrightness*` забиндены) +
+    **авто-затемнение по простою** (`uconsole-idle-dim`: ~60с без активности →
+    подсветка 10%, при действии — назад). Главный рычаг против idle-потребления;
   - **CPU governor** по умолчанию **`powersave`** (минимальная частота → максимум
     автономности, но устройство небыстрое) — сервис `uconsole-cpufreq`; для скорости
     смени на `schedutil` в `/usr/local/bin/uconsole-cpufreq`;

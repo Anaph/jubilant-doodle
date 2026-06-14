@@ -26,6 +26,11 @@ if command -v uconsole-powerd >/dev/null 2>&1; then
     pgrep -f uconsole-powerd >/dev/null 2>&1 || uconsole-powerd &
 fi
 
+# Auto-dim the backlight after a while idle (the biggest idle-power lever).
+if command -v uconsole-idle-dim >/dev/null 2>&1; then
+    pgrep -f uconsole-idle-dim >/dev/null 2>&1 || uconsole-idle-dim &
+fi
+
 # --- Bluetooth tray applet -------------------------------------------------
 if command -v blueman-applet >/dev/null 2>&1; then
     pgrep -x blueman-applet >/dev/null 2>&1 || blueman-applet &

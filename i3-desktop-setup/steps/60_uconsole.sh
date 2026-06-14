@@ -15,7 +15,7 @@ log_step "uConsole (CM5) tweaks"
 CFG="$REPO_DIR/config"
 
 # --- Packages --------------------------------------------------------------
-UCON_PKGS=(bluez blueman usb-modeswitch usb-modeswitch-data tlp powertop zram-tools rfkill python3-evdev)
+UCON_PKGS=(bluez blueman usb-modeswitch usb-modeswitch-data tlp powertop zram-tools rfkill python3-evdev xprintidle)
 log_info "Installing uConsole packages: ${UCON_PKGS[*]}"
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${UCON_PKGS[@]}"
 
@@ -61,6 +61,7 @@ sudo rm -f /usr/local/bin/uconsole-bl-toggle   # superseded by uconsole-sleep
 sudo install -D -m 0755 "$CFG/uconsole/sleep.sh"     /usr/local/bin/uconsole-sleep
 sudo install -D -m 0755 "$CFG/uconsole/powersave.sh" /usr/local/bin/uconsole-powersave
 sudo install -D -m 0755 "$CFG/uconsole/powerd.py"    /usr/local/bin/uconsole-powerd
+sudo install -D -m 0755 "$CFG/uconsole/idle-dim.sh"  /usr/local/bin/uconsole-idle-dim
 # video: brightnessctl; input: the power-button daemon reading /dev/input.
 sudo usermod -aG video,input "$TARGET_USER" 2>/dev/null || true
 printf '%s ALL=(root) NOPASSWD: /usr/local/bin/uconsole-powersave\n' "$TARGET_USER" \
