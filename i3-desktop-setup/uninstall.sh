@@ -121,18 +121,31 @@ if [ -f "$AUTOLOGIN_DROPIN" ]; then
     log_info "Removed tty1 autologin drop-in"
 fi
 
+# --- Undo uConsole power-saving services + Bluetooth state -----------------
+if [ -f /etc/systemd/system/uconsole-cpufreq.service ] || \
+   [ -f /etc/systemd/system/uconsole-rfkill-bt.service ]; then
+    need_sudo
+    sudo systemctl disable --now uconsole-cpufreq.service uconsole-rfkill-bt.service 2>/dev/null || true
+    sudo rfkill unblock bluetooth 2>/dev/null || true
+    sudo systemctl enable bluetooth 2>/dev/null || true   # restore (we had disabled it)
+fi
+
 # --- Undo uConsole system files --------------------------------------------
 for sysf in \
     /etc/udev/rules.d/99-huawei-hilink.rules \
     /etc/tlp.d/01-uconsole.conf \
     /etc/lightdm/lightdm.conf.d/10-uconsole-rotate.conf \
-    /usr/local/bin/uconsole-rotate.sh; do
+    /usr/local/bin/uconsole-rotate.sh \
+    /usr/local/bin/uconsole-cpufreq \
+    /etc/systemd/system/uconsole-cpufreq.service \
+    /etc/systemd/system/uconsole-rfkill-bt.service; do
     if [ -f "$sysf" ]; then
         need_sudo
         sudo rm -f "$sysf"
         log_info "Removed $sysf"
     fi
 done
+sudo systemctl daemon-reload 2>/dev/null || true
 
 # --- Optional: purge packages ----------------------------------------------
 if [ "$PURGE" = 1 ]; then

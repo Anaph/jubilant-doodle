@@ -138,13 +138,25 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 - строка состояния на **i3blocks** (светлый текст на жёстко-тёмном баре): заряд
   батареи (AXP228), уровень 4G-сигнала донгла, CPU-график, диск, память, время;
   состояние сети — в трее (иконка nm-applet справа);
-- **Bluetooth** (`bluez` + `blueman`, апплет в трее);
 - **USB HiLink-модем** (Huawei E3372h): `usb-modeswitch` + udev-правило, чтобы
   ModemManager не перехватывал донгл (он подключается как обычная сетевая карта,
   NetworkManager поднимает DHCP сам);
-- энергосбережение: `tlp` (с отключённым USB-autosuspend, чтобы не отрубать донгл),
-  сжатый swap `zram`, диагностический `powertop`;
+- **энергосбережение** (подсветка — главный потребитель):
+  - **DPMS** — гашение экрана после ~5 мин простоя + блокировка (`xss-lock`+`i3lock`);
+  - стартовая **яркость 60%** (клавиши яркости `XF86MonBrightness*` уже забиндены);
+  - **CPU governor** `schedutil` закреплён сервисом `uconsole-cpufreq` (правится в
+    `/usr/local/bin/uconsole-cpufreq` — можно `powersave` или потолок частоты);
+  - **Bluetooth выключен** по умолчанию (`rfkill` + сервис), `bluez`/`blueman`
+    остаются — включить: `sudo rfkill unblock bluetooth && sudo systemctl start bluetooth`;
+  - `tlp` (USB-autosuspend off, чтобы не отрубать донгл), `zram`, `powertop`;
 - увеличенные шрифты под 5″/720p.
+
+**Энергосбережение вручную** (firmware/железо — не автоматизирую):
+- андерклок в `/boot/firmware/config.txt` — умеренно `arm_freq=1800 gpu_freq=500`,
+  агрессивно `arm_freq=1000 arm_freq_min=500`;
+- калибровка индикатора батареи:
+  `echo 1 | sudo tee /sys/class/power_supply/axp20x-battery/calibrate`, затем
+  полный разряд→заряд.
 
 **4G-донгл E3372h-153 (HiLink).** Это не serial-модем, а USB-сетевая карта:
 воткнул → `usb0`/`enx…` → NetworkManager даёт DHCP. APN/PIN/сигнал настраиваются в

@@ -15,12 +15,42 @@ log_step "uConsole (CM5) tweaks"
 CFG="$REPO_DIR/config"
 
 # --- Packages --------------------------------------------------------------
-UCON_PKGS=(bluez blueman usb-modeswitch usb-modeswitch-data tlp powertop zram-tools)
+UCON_PKGS=(bluez blueman usb-modeswitch usb-modeswitch-data tlp powertop zram-tools xss-lock rfkill)
 log_info "Installing uConsole packages: ${UCON_PKGS[*]}"
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${UCON_PKGS[@]}"
 
-# --- Services: Bluetooth + power saving ------------------------------------
-sudo systemctl enable bluetooth 2>/dev/null || true
+# --- Services: power saving ------------------------------------------------
+# Bluetooth off by default to save power (blueman/bluez stay installed so it can
+# be turned on when needed). A boot service rfkill-blocks the radio.
+sudo systemctl disable bluetooth 2>/dev/null || true
+sudo tee /etc/systemd/system/uconsole-rfkill-bt.service >/dev/null <<'EOF'
+[Unit]
+Description=uConsole: block the Bluetooth radio at boot (power saving)
+After=multi-user.target
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'rfkill block bluetooth || true'
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl enable uconsole-rfkill-bt.service 2>/dev/null || true
+sudo systemctl start uconsole-rfkill-bt.service 2>/dev/null || true
+
+# CPU governor (schedutil) pinned at boot; edit /usr/local/bin/uconsole-cpufreq
+# to switch to powersave or cap the peak frequency.
+sudo install -D -m 0755 "$CFG/uconsole/cpufreq.sh" /usr/local/bin/uconsole-cpufreq
+sudo tee /etc/systemd/system/uconsole-cpufreq.service >/dev/null <<'EOF'
+[Unit]
+Description=uConsole: set an efficient CPU governor
+After=multi-user.target
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/uconsole-cpufreq
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl enable uconsole-cpufreq.service 2>/dev/null || true
+sudo systemctl start uconsole-cpufreq.service 2>/dev/null || true
 
 # tlp for battery life; but never autosuspend USB (would drop the LTE dongle,
 # keyboard or other peripherals).

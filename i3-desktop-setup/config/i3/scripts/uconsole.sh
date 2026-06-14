@@ -15,6 +15,19 @@ if command -v xrandr >/dev/null 2>&1 && [ -n "$ROTATE" ]; then
     xrandr --output "$out" --rotate "$ROTATE" 2>/dev/null || true
 fi
 
+# --- Power saving ----------------------------------------------------------
+# The backlight is the biggest battery drain, so dim a little at start and let
+# DPMS blank the screen on idle (lock on blank via xss-lock).
+command -v brightnessctl >/dev/null 2>&1 && brightnessctl set 60% >/dev/null 2>&1
+if command -v xset >/dev/null 2>&1; then
+    xset +dpms 2>/dev/null || true
+    xset s 300 300 2>/dev/null || true     # screensaver after 5 min
+    xset dpms 0 0 300 2>/dev/null || true   # display off after 5 min idle
+fi
+if command -v xss-lock >/dev/null 2>&1; then
+    pgrep -x xss-lock >/dev/null 2>&1 || xss-lock -- i3lock -c 15161e &
+fi
+
 # --- Bluetooth tray applet -------------------------------------------------
 if command -v blueman-applet >/dev/null 2>&1; then
     pgrep -x blueman-applet >/dev/null 2>&1 || blueman-applet &
