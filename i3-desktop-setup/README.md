@@ -163,7 +163,12 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
     активный 4G-донгл не даёт CPU уйти в глубокий idle (виден в `powertop` как
     `1000480000.usb`) — гаси USB-рейл, когда 4G не нужен, это **главный** способ
     снизить простойное потребление;
-  - `tlp` (USB-autosuspend off, чтобы не отрубать донгл), `zram`, `powertop`;
+  - `tlp` с **USB-autosuspend ON**: встроенные клавиатура/трекбол uConsole — это
+    `1000480000.usb` в `powertop`, главный источник USB-«будильников» в простое;
+    с autosuspend они засыпают → CPU уходит глубже. 4G-донгл в `USB_DENYLIST`,
+    чтобы не отваливался. Если клавиатура начнёт терять первое нажатие после
+    простоя — `USB_AUTOSUSPEND=0` в `/etc/tlp.d/01-uconsole.conf` + `sudo tlp start`;
+  - `zram`, `powertop`;
 - увеличенные шрифты под 5″/720p.
 
 > Сон по кнопке начинает работать **после перезагрузки** (logind и группы

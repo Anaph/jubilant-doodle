@@ -81,10 +81,18 @@ EOF
 # keyboard or other peripherals).
 sudo install -d -m 0755 /etc/tlp.d
 sudo tee /etc/tlp.d/01-uconsole.conf >/dev/null <<'EOF'
-# uConsole: keep USB peripherals (LTE dongle, etc.) always powered.
-USB_AUTOSUSPEND=0
+# uConsole power saving.
+# Enable USB autosuspend so the built-in keyboard/trackball (and the USB
+# controller) can idle — they are the main idle wakeup source on the uConsole
+# (powertop "1000480000.usb"). The HiLink 4G dongle is kept always-on via the
+# denylist so 4G stays connected when it is in use.
+# If the keyboard becomes unresponsive or loses the first keypress after idle,
+# set USB_AUTOSUSPEND=0 here (or add its id to USB_DENYLIST) and run: sudo tlp start
+USB_AUTOSUSPEND=1
+USB_DENYLIST="12d1:14dc 12d1:1f01"
 EOF
 sudo systemctl enable tlp 2>/dev/null || true
+sudo tlp start 2>/dev/null || true   # apply immediately (no reboot needed)
 
 # zram compressed swap — valuable on a RAM-constrained handheld.
 sudo tee /etc/default/zramswap >/dev/null <<'EOF'
