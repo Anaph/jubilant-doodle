@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """uconsole-powerd — power-button watcher for the uConsole deep-sleep.
 
-Reads the power button straight from /dev/input, so it still sees presses while
-i3lock holds the X keyboard grab (where an i3 keybinding would not fire). On a
-short press it runs `uconsole-sleep` (which toggles the deep low-power state);
-long presses are left to logind (poweroff).
+Runs `uconsole-sleep` on a power-button press (toggles the deep low-power state).
+Reads /dev/input directly, so it works through i3lock's keyboard grab. Triggers
+on the key *press* (some power buttons send no release event) with a short
+debounce, and watches every device that exposes a power/sleep key.
+
+Debugging: run it in a terminal and press the button — it logs the device it
+watches and every detected press.
 
 Needs python3-evdev and the user in the "input" group.
 """
+import selectors
 import subprocess
 import sys
 import time
@@ -19,37 +23,52 @@ except Exception as exc:  # noqa: BLE001
     sys.stderr.write("uconsole-powerd: python3-evdev not available: %s\n" % exc)
     sys.exit(1)
 
-SHORT_MAX = 1.2  # seconds; a longer hold is a "long press" -> leave it to logind
+POWER_KEYS = {getattr(ecodes, n) for n in ("KEY_POWER", "KEY_SLEEP", "KEY_SUSPEND")
+              if hasattr(ecodes, n)}
+DEBOUNCE = 0.8  # seconds between accepted presses
 
 
-def find_power_device():
+def power_devices():
+    found = []
     for path in evdev.list_devices():
         try:
             dev = evdev.InputDevice(path)
         except Exception:  # noqa: BLE001
             continue
-        if ecodes.KEY_POWER in dev.capabilities().get(ecodes.EV_KEY, []):
-            return dev
-    return None
+        keys = set(dev.capabilities().get(ecodes.EV_KEY, []))
+        if keys & POWER_KEYS:
+            found.append(dev)
+    return found
 
 
 def main():
-    dev = find_power_device()
-    if dev is None:
-        sys.stderr.write("uconsole-powerd: no KEY_POWER input device found\n")
+    devices = power_devices()
+    if not devices:
+        sys.stderr.write("uconsole-powerd: no power/sleep-key input device found "
+                         "(is the user in the 'input' group? what does the button emit?)\n")
         sys.exit(1)
-    sys.stderr.write("uconsole-powerd: watching %s (%s)\n" % (dev.path, dev.name))
 
-    pressed_at = None
-    for event in dev.read_loop():
-        if event.type != ecodes.EV_KEY or event.code != ecodes.KEY_POWER:
-            continue
-        if event.value == 1:            # key down
-            pressed_at = time.time()
-        elif event.value == 0:          # key up
-            if pressed_at is not None and (time.time() - pressed_at) < SHORT_MAX:
-                subprocess.Popen(["uconsole-sleep"])
-            pressed_at = None
+    sel = selectors.DefaultSelector()
+    for dev in devices:
+        sys.stderr.write("uconsole-powerd: watching %s (%s)\n" % (dev.path, dev.name))
+        sel.register(dev, selectors.EVENT_READ)
+
+    last = 0.0
+    while True:
+        for key, _ in sel.select():
+            try:
+                events = list(key.fileobj.read())
+            except OSError:
+                continue
+            for ev in events:
+                if ev.type == ecodes.EV_KEY and ev.code in POWER_KEYS and ev.value == 1:
+                    now = time.time()
+                    if now - last < DEBOUNCE:
+                        continue
+                    last = now
+                    sys.stderr.write("uconsole-powerd: power key pressed -> uconsole-sleep\n")
+                    sys.stderr.flush()
+                    subprocess.Popen(["uconsole-sleep"])
 
 
 if __name__ == "__main__":
