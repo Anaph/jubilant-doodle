@@ -184,6 +184,38 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 > выбрано — максимум экономии). Настоящего `systemctl suspend` (s2idle) на CM5
 > нет — он часто не просыпается, поэтому не используется.
 
+### Глубже кнопочного «сна»: выключение + пробуждение по RTC (вручную, экспериментально)
+
+Настоящего suspend-to-RAM (S3, мгновенный resume по клавише) на CM5/BCM2712 нет.
+Но можно **полностью выключиться** (PMIC → STANDBY, ~3 mA) и **проснуться по
+будильнику RTC или кнопке** — это не resume, а холодная загрузка (сессия теряется,
+~20–30 c на подъём). Установщик этого **не делает**; команды для ручной проверки:
+
+1. **EEPROM** (`sudo -E rpi-eeprom-config --edit`, затем перезагрузка):
+   - `POWER_OFF_ON_HALT=1` — после `poweroff` PMIC гасит все рейлы (иначе halt-петля);
+   - `WAKE_ON_GPIO=0` — будит **только RTC**; `=1` — ещё и кнопка/GPIO.
+2. (Опц.) подзарядка RTC-батарейки: `dtparam=rtc_bbat_vchg=3000000` в
+   `/boot/firmware/config.txt`.
+3. Проверить RTC: `cat /sys/class/rtc/rtc0/name` (на uConsole AIO RTC обычно есть).
+4. Уснуть на N секунд и проснуться:
+   ```bash
+   echo +120 | sudo tee /sys/class/rtc/rtc0/wakealarm   # короткий тест!
+   sudo poweroff
+   ```
+   Сбросить будильник: `echo 0 | sudo tee /sys/class/rtc/rtc0/wakealarm`.
+   Альтернатива: `sudo rtcwake -m no -s 120` (ставит будильник, не усыпляя) + `sudo poweroff`.
+
+> **⚠️ uConsole:** силовая часть сделана под CM3, у CM5 другой PMIC — есть
+> сообщения, что устройство уходит в suspend и не просыпается / не выключается без
+> вынимания батареи. Тестируй **коротким** будильником (`+120`) и держи наготове
+> хард-ресет, прежде чем на это полагаться.
+
+**Сохранить сессию** (а не cold boot) → **hibernate (S4, suspend-to-disk)**: RAM
+пишется на диск, плата гаснет в ~0, при включении (кнопкой/RTC) поднимается та же
+сессия. Нужен **дисковый** swap ≥ RAM (zram как resume-устройство не годится),
+`resume=UUID(…)` + initramfs-resume-хук; медленно и изнашивает SD/eMMC, resume на
+Pi бывает капризным. В установщик не включено — настраивать вручную.
+
 **AIO v2 (HackerGadgets) — флаг `--aio`.** Ставит **базовый пакет платы**
 `hackergadgets-uconsole-aio-board` (GPIO/rails/RTC/`pinctrl`; если его apt-репо
 не подключён — установщик предупредит) и клиент **`aiov2_ctl`** (из исходников
