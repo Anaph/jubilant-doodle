@@ -196,7 +196,11 @@ if [ "${AIO:-0}" = 1 ]; then
     AIO_DIR="$TARGET_HOME/.local/share/aiov2_ctl"
     git_clone_idempotent "https://github.com/hackergadgets/aiov2_ctl.git" "$AIO_DIR"
     if [ -f "$AIO_DIR/aiov2_ctl.py" ] && sudo python3 "$AIO_DIR/aiov2_ctl.py" --install; then
-        log_ok "aiov2_ctl installed (tray GUI autostarts in i3; CLI e.g. 'aiov2_ctl --status')"
+        # Keep the GUI tray OUT of autostart: it polls power/GPIO at 1 Hz, a top
+        # idle-CPU drain, and the i3 bar already shows battery/watts. Disable the
+        # tool's own XDG autostart entry too; launch on demand via Super+Shift+a.
+        run_as_user aiov2_ctl --no-autostart >/dev/null 2>&1 || true
+        log_ok "aiov2_ctl installed (tray on demand: Super+Shift+a; CLI e.g. 'aiov2_ctl --status')"
     else
         log_warn "aiov2_ctl install failed; run 'sudo python3 $AIO_DIR/aiov2_ctl.py --install' manually"
     fi

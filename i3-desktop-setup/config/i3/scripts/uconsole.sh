@@ -36,7 +36,6 @@ if command -v blueman-applet >/dev/null 2>&1; then
     pgrep -x blueman-applet >/dev/null 2>&1 || blueman-applet &
 fi
 
-# --- AIO v2 control tray (HackerGadgets), if installed ---------------------
-if command -v aiov2_ctl >/dev/null 2>&1; then
-    pgrep -f 'aiov2_ctl .*--gui' >/dev/null 2>&1 || aiov2_ctl --gui &
-fi
+# The AIO v2 control tray is intentionally NOT autostarted: its GUI polls
+# power/GPIO once a second (a top idle-CPU drain), and the i3 bar already shows
+# battery and watts. Launch it on demand with Super+Shift+a (aiov2_ctl --gui).

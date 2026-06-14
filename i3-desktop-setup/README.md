@@ -188,8 +188,11 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 `hackergadgets-uconsole-aio-board` (GPIO/rails/RTC/`pinctrl`; если его apt-репо
 не подключён — установщик предупредит) и клиент **`aiov2_ctl`** (из исходников
 `github.com/hackergadgets/aiov2_ctl`): тумблеры GPS/LoRa/SDR/USB, телеметрия
-питания, GUI-трей (автозапуск в i3), CLI (`aiov2_ctl --status`,
-`aiov2_ctl <FEATURE> on|off`).
+питания, CLI (`aiov2_ctl --status`, `aiov2_ctl <FEATURE> on|off`) и GUI-трей.
+Трей **намеренно не в автозапуске** (его GUI опрашивает питание/GPIO раз в
+секунду — это один из главных пожирателей CPU в простое, а батарея/ватты и так
+есть в баре); запускай по требованию хоткеем **`Super+Shift+a`** (`aiov2_ctl
+--gui`).
 
 **Андерклок — флаг `--underclock[=moderate|aggressive]`** (правит
 `/boot/firmware/config.txt`, блок с маркером + бэкап `*.i3ds.bak`, действует после
