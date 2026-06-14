@@ -147,6 +147,7 @@ for sysf in \
     /etc/systemd/logind.conf.d/10-uconsole-powerkey.conf \
     /usr/local/bin/uconsole-rotate.sh \
     /usr/local/bin/uconsole-cpufreq \
+    /usr/local/bin/uconsole-bl-toggle \
     /etc/systemd/system/uconsole-cpufreq.service \
     /etc/systemd/system/uconsole-rfkill-bt.service; do
     if [ -f "$sysf" ]; then

@@ -142,24 +142,29 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
   ModemManager не перехватывал донгл (он подключается как обычная сетевая карта,
   NetworkManager поднимает DHCP сам);
 - **энергосбережение** (подсветка — главный потребитель):
-  - **DPMS** — гашение экрана после ~5 мин простоя + блокировка (`xss-lock`+`i3lock`);
-  - стартовая **яркость 60%** (клавиши яркости `XF86MonBrightness*` уже забиндены);
+  - **кнопка питания → «сон»**: короткое нажатие гасит подсветку (бинд
+    `XF86PowerOff` в i3 → `uconsole-bl-toggle` через `brightnessctl`), повторное
+    нажатие — будит. DPMS на DSI-панели подсветку не гасит, поэтому используется
+    `brightnessctl`. Долгое нажатие → выключение (`HandlePowerKeyLongPress`);
+  - стартовая **яркость 60%** (клавиши яркости `XF86MonBrightness*` забиндены);
   - **CPU governor** `schedutil` закреплён сервисом `uconsole-cpufreq` (правится в
     `/usr/local/bin/uconsole-cpufreq` — можно `powersave` или потолок частоты);
   - **Bluetooth выключен** по умолчанию (`rfkill` + сервис), `bluez`/`blueman`
     остаются — включить: `sudo rfkill unblock bluetooth && sudo systemctl start bluetooth`;
-  - **кнопка питания**: короткое нажатие → «сон» (гашение подсветки + блокировка,
-    через `systemd-logind HandlePowerKey=lock`), долгое → выключение
-    (`HandlePowerKeyLongPress=poweroff`). Действует после перезагрузки;
   - `tlp` (USB-autosuspend off, чтобы не отрубать донгл), `zram`, `powertop`;
 - увеличенные шрифты под 5″/720p.
 
-**AIO v2 (HackerGadgets) — флаг `--aio`.** Ставит клиент **`aiov2_ctl`** (из
-исходников `github.com/hackergadgets/aiov2_ctl`): тумблеры GPS/LoRa/SDR/USB,
-телеметрия питания, GUI-трей (автозапуск в i3), CLI (`aiov2_ctl --status`,
-`aiov2_ctl <FEATURE> on|off`). Базовый пакет платы
-`hackergadgets-uconsole-aio-board` (GPIO/rails/RTC/`pinctrl`) — предпосылка,
-ставится из apt-репозитория HackerGadgets.
+> Сон по кнопке начинает работать **после перезагрузки** (logind перечитывает
+> конфиг на старте) и нужен пользователь в группе `video` (добавляется
+> установщиком). Блокировки при «сне» нет — это переключатель подсветки; если
+> нужна блокировка-при-сне, скажи (сделаю отдельным демоном кнопки).
+
+**AIO v2 (HackerGadgets) — флаг `--aio`.** Ставит **базовый пакет платы**
+`hackergadgets-uconsole-aio-board` (GPIO/rails/RTC/`pinctrl`; если его apt-репо
+не подключён — установщик предупредит) и клиент **`aiov2_ctl`** (из исходников
+`github.com/hackergadgets/aiov2_ctl`): тумблеры GPS/LoRa/SDR/USB, телеметрия
+питания, GUI-трей (автозапуск в i3), CLI (`aiov2_ctl --status`,
+`aiov2_ctl <FEATURE> on|off`).
 
 **Энергосбережение вручную** (firmware/железо — не автоматизирую):
 - андерклок в `/boot/firmware/config.txt` — умеренно `arm_freq=1800 gpu_freq=500`,

@@ -15,7 +15,7 @@ log_step "uConsole (CM5) tweaks"
 CFG="$REPO_DIR/config"
 
 # --- Packages --------------------------------------------------------------
-UCON_PKGS=(bluez blueman usb-modeswitch usb-modeswitch-data tlp powertop zram-tools xss-lock rfkill)
+UCON_PKGS=(bluez blueman usb-modeswitch usb-modeswitch-data tlp powertop zram-tools rfkill)
 log_info "Installing uConsole packages: ${UCON_PKGS[*]}"
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${UCON_PKGS[@]}"
 
@@ -52,13 +52,16 @@ EOF
 sudo systemctl enable uconsole-cpufreq.service 2>/dev/null || true
 sudo systemctl start uconsole-cpufreq.service 2>/dev/null || true
 
-# Power button: a short press locks (xss-lock blanks the backlight = "sleep"); a
-# long press powers off. Requires the power button to emit KEY_POWER (it does on
-# the stock/AIO uConsole). Takes effect after a reboot.
+# Power button: a short press toggles the backlight ("sleep") — i3 binds
+# XF86PowerOff to uconsole-bl-toggle; a long press powers off. logind ignores
+# the short press so the key reaches i3. Toggling the backlight via brightnessctl
+# needs the user in the "video" group. Takes effect after a reboot.
+sudo install -D -m 0755 "$CFG/uconsole/bl-toggle.sh" /usr/local/bin/uconsole-bl-toggle
+sudo usermod -aG video "$TARGET_USER" 2>/dev/null || true
 sudo install -d -m 0755 /etc/systemd/logind.conf.d
 sudo tee /etc/systemd/logind.conf.d/10-uconsole-powerkey.conf >/dev/null <<'EOF'
 [Login]
-HandlePowerKey=lock
+HandlePowerKey=ignore
 HandlePowerKeyLongPress=poweroff
 EOF
 
@@ -129,7 +132,12 @@ log_info "Bar/UI fonts sized for the 720p panel"
 
 # --- HackerGadgets AIO v2 control tool (aiov2_ctl) --------------------------
 if [ "${AIO:-0}" = 1 ]; then
-    log_info "Installing AIO v2 control tool (aiov2_ctl)"
+    log_info "Installing AIO v2 board package + control tool"
+    # Core board integration (GPIO/rails/RTC/pinctrl) from the HackerGadgets repo.
+    if ! sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --install-recommends hackergadgets-uconsole-aio-board; then
+        log_warn "hackergadgets-uconsole-aio-board not found — its apt repo isn't configured."
+        log_warn "Add the HackerGadgets AIO apt repo (see their setup guide), then re-run."
+    fi
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python3 python3-pyqt6 git \
         || log_warn "Could not install aiov2_ctl dependencies"
     AIO_DIR="$TARGET_HOME/.local/share/aiov2_ctl"
