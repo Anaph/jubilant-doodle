@@ -94,6 +94,19 @@ EOF
 sudo systemctl enable tlp 2>/dev/null || true
 sudo tlp start 2>/dev/null || true   # apply immediately (no reboot needed)
 
+# Reduce the USB HID polling rate of the built-in keyboard/trackball: the host
+# polls them ~125 Hz each (≈200 interrupts/s total — "1000480000.usb" in
+# powertop), keeping the CPU awake even at idle. Lower poll rates cut that
+# (raise the numbers for more saving / slightly laggier input). Reboot to apply.
+CMDLINE=/boot/firmware/cmdline.txt
+[ -f "$CMDLINE" ] || CMDLINE=/boot/cmdline.txt
+if [ -f "$CMDLINE" ]; then
+    sudo cp -n "$CMDLINE" "$CMDLINE.i3ds.bak" 2>/dev/null || true
+    sudo sed -i -E 's/[[:space:]]+usbhid\.(mousepoll|kbpoll|jspoll)=[0-9]+//g' "$CMDLINE"
+    sudo sed -i -E '1 s/[[:space:]]+$//; 1 s/$/ usbhid.mousepoll=16 usbhid.kbpoll=32/' "$CMDLINE"
+    log_info "Reduced USB HID poll (mousepoll=16 kbpoll=32) in $CMDLINE — reboot to apply"
+fi
+
 # zram compressed swap — valuable on a RAM-constrained handheld.
 sudo tee /etc/default/zramswap >/dev/null <<'EOF'
 ALGO=zstd

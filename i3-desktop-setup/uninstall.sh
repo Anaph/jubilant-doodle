@@ -186,6 +186,15 @@ for cfg in /boot/firmware/config.txt /boot/config.txt; do
     fi
 done
 
+# Strip the USB HID poll-rate params we appended to cmdline.txt (if present).
+for cmd in /boot/firmware/cmdline.txt /boot/cmdline.txt; do
+    if [ -f "$cmd" ] && grep -qE 'usbhid\.(mousepoll|kbpoll|jspoll)=[0-9]+' "$cmd"; then
+        need_sudo
+        sudo sed -i -E 's/[[:space:]]+usbhid\.(mousepoll|kbpoll|jspoll)=[0-9]+//g' "$cmd"
+        log_info "Removed USB HID poll params from $cmd (reboot to apply)"
+    fi
+done
+
 # --- Optional: purge packages ----------------------------------------------
 if [ "$PURGE" = 1 ]; then
     if confirm "apt-purge ALL packages from packages.txt (this removes Xorg, i3, etc.)?"; then
