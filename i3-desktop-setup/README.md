@@ -69,6 +69,7 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
 | `Super+Return` | Alacritty (`Super+Shift+Return` — запасной xterm) |
 | `Super+d` | лаунчер приложений (rofi) |
 | `Super+Shift+b` | браузер (firefox-esr / x-www-browser) |
+| `Super+Shift+u` | вкл/выкл USB-рейл 4G-донгла (uConsole) — экономия в простое |
 | `Super+Shift+q` | закрыть окно |
 | `Super+1..0` | переключение рабочих столов |
 | `Super+r` | режим изменения размера |
@@ -158,6 +159,10 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
     смени на `schedutil` в `/usr/local/bin/uconsole-cpufreq`;
   - **Bluetooth выключен** по умолчанию (`rfkill` + сервис), `bluez`/`blueman`
     остаются — включить: `sudo rfkill unblock bluetooth && sudo systemctl start bluetooth`;
+  - **USB/4G тумблер** `Super+Shift+u` (`uconsole-usb-toggle` → `aiov2_ctl USB`):
+    активный 4G-донгл не даёт CPU уйти в глубокий idle (виден в `powertop` как
+    `1000480000.usb`) — гаси USB-рейл, когда 4G не нужен, это **главный** способ
+    снизить простойное потребление;
   - `tlp` (USB-autosuspend off, чтобы не отрубать донгл), `zram`, `powertop`;
 - увеличенные шрифты под 5″/720p.
 

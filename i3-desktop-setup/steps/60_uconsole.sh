@@ -62,6 +62,7 @@ sudo install -D -m 0755 "$CFG/uconsole/sleep.sh"     /usr/local/bin/uconsole-sle
 sudo install -D -m 0755 "$CFG/uconsole/powersave.sh" /usr/local/bin/uconsole-powersave
 sudo install -D -m 0755 "$CFG/uconsole/powerd.py"    /usr/local/bin/uconsole-powerd
 sudo install -D -m 0755 "$CFG/uconsole/idle-dim.sh"  /usr/local/bin/uconsole-idle-dim
+sudo install -D -m 0755 "$CFG/uconsole/usb-toggle.sh" /usr/local/bin/uconsole-usb-toggle
 # video: brightnessctl; input: the power-button daemon reading /dev/input.
 sudo usermod -aG video,input "$TARGET_USER" 2>/dev/null || true
 printf '%s ALL=(root) NOPASSWD: /usr/local/bin/uconsole-powersave\n' "$TARGET_USER" \
