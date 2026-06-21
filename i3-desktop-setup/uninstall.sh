@@ -153,9 +153,16 @@ fi
 rm -rf "$TARGET_HOME/.local/share/aiov2_ctl"
 
 # --- Undo uConsole system files --------------------------------------------
+# Capture whether the extra power tweaks were installed (files are removed below,
+# so the flag must be read first) to know whether to restore timers/configs.
+POWER_TWEAKS=0
+[ -f /etc/sysctl.d/60-uconsole-powersave.conf ] && POWER_TWEAKS=1
 for sysf in \
     /etc/udev/rules.d/99-huawei-hilink.rules \
     /etc/tlp.d/01-uconsole.conf \
+    /etc/NetworkManager/conf.d/01-uconsole-powersave.conf \
+    /etc/sysctl.d/60-uconsole-powersave.conf \
+    /etc/systemd/journald.conf.d/01-uconsole-powersave.conf \
     /etc/lightdm/lightdm.conf.d/10-uconsole-rotate.conf \
     /etc/systemd/logind.conf.d/10-uconsole-powerkey.conf \
     /usr/local/bin/uconsole-rotate.sh \
@@ -177,12 +184,27 @@ for sysf in \
 done
 sudo systemctl daemon-reload 2>/dev/null || true
 
-# Remove the underclock block from config.txt (if we added it).
+# Restore the maintenance timers/services we disabled and reload the configs we
+# changed for power saving (only if those tweaks were installed).
+if [ "$POWER_TWEAKS" = 1 ]; then
+    need_sudo
+    sudo systemctl unmask packagekit.service 2>/dev/null || true
+    for unit in apt-daily.timer apt-daily-upgrade.timer man-db.timer e2scrub_all.timer fwupd-refresh.timer; do
+        sudo systemctl enable --now "$unit" 2>/dev/null || true
+    done
+    sudo nmcli general reload conf 2>/dev/null || true
+    sudo sysctl -q --system 2>/dev/null || true
+    sudo systemctl restart systemd-journald 2>/dev/null || true
+    log_info "Restored maintenance timers; reloaded NM/sysctl/journald to defaults"
+fi
+
+# Remove the config.txt blocks we added (underclock + LED power saving).
 for cfg in /boot/firmware/config.txt /boot/config.txt; do
-    if [ -f "$cfg" ] && grep -q 'i3ds-underclock' "$cfg"; then
+    if [ -f "$cfg" ] && grep -qE 'i3ds-underclock|i3ds-power' "$cfg"; then
         need_sudo
         sudo sed -i '/# >>> i3ds-underclock >>>/,/# <<< i3ds-underclock <<</d' "$cfg"
-        log_info "Removed underclock block from $cfg"
+        sudo sed -i '/# >>> i3ds-power >>>/,/# <<< i3ds-power <<</d' "$cfg"
+        log_info "Removed i3ds config.txt blocks from $cfg"
     fi
 done
 

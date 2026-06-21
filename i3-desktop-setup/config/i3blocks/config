@@ -6,30 +6,32 @@
 separator=false
 separator_block_width=22
 
+# Intervals are deliberately relaxed: each refresh forks a shell, so longer
+# intervals mean fewer idle CPU wakeups (battery/disk change slowly anyway).
 [4g]
 command=~/.config/i3blocks/scripts/4g-signal.sh
-interval=10
+interval=30
 
 [cpu]
 command=~/.config/i3blocks/scripts/cpu-graph.sh
-interval=2
+interval=3
 
 [disk]
 command=df -h --output=avail / | awk 'NR==2{gsub(/ /,"");print "DISK " $1}'
-interval=30
+interval=120
 
 [memory]
 command=free -h | awk '/^Mem:/ {print "RAM " $3}'
-interval=10
+interval=30
 
 [battery]
 command=~/.config/i3blocks/scripts/battery.sh
-interval=20
+interval=60
 
 [power]
 command=~/.config/i3blocks/scripts/power-watts.sh
-interval=5
+interval=10
 
 [time]
 command=date '+%a %d %b  %H:%M'
-interval=5
+interval=30

@@ -176,6 +176,22 @@ curl -fsSL https://raw.githubusercontent.com/Anaph/jubilant-doodle/main/i3-deskt
     `1000480000.usb`), что будит CPU даже в простое; так трекбол опрашивается ~62 Гц,
     клавиатура ~31 Гц. Хочешь больше экономии — увеличь числа (ввод чуть «ленивее»),
     хочешь отзывчивее — уменьши/убери;
+  - **Wi-Fi power-save** (`wifi.powersave=3` в `/etc/NetworkManager/conf.d/01-uconsole-powersave.conf`)
+    + отключён периодический connectivity-ping NM (`[connectivity] interval=0`) —
+    меньше постоянного радио в простое; применяется после переподключения/перезагрузки.
+    Лагает первый пакет — поставь `wifi.powersave=2`;
+  - **меньше фоновых пробуждений**: погашены таймеры `apt-daily(-upgrade)`,
+    `man-db`, `e2scrub_all`, `fwupd-refresh` и сервис `packagekit` (`fstrim.timer`
+    оставлен — TRIM полезен для SD); реже дисковый writeback (`vm.dirty_writeback_centisecs=1500`,
+    `laptop_mode=5` в `/etc/sysctl.d/60-uconsole-powersave.conf`); **журнал в RAM**
+    (`journald Storage=volatile`, 32 МБ — меньше записей на SD, но логи **не переживают
+    перезагрузку**); увеличены интервалы блоков i3blocks (реже форк-спавны);
+  - **runtime-PM=auto для PCI(e)** через tlp (`RUNTIME_PM_*=auto`) — простаивающие
+    контроллеры (мост RP1) уходят в сон; USB не трогается (им рулит autosuspend выше);
+  - **ACT/PWR-светодиоды выключены** (`dtparam=*_led_trigger=none` в `config.txt`,
+    блок `i3ds-power`, бэкап `*.i3ds.bak`, после перезагрузки);
+  - аудиокодек засыпает сам — WirePlumber по умолчанию суспендит простаивающие
+    узлы через ~5 c, отдельной настройки не нужно;
   - `zram`, `powertop`;
 - увеличенные шрифты под 5″/720p.
 

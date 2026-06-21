@@ -90,6 +90,10 @@ sudo tee /etc/tlp.d/01-uconsole.conf >/dev/null <<'EOF'
 # set USB_AUTOSUSPEND=0 here (or add its id to USB_DENYLIST) and run: sudo tlp start
 USB_AUTOSUSPEND=1
 USB_DENYLIST="12d1:14dc 12d1:1f01"
+# Runtime PM for PCI(e) devices so idle controllers (e.g. the RP1 bridge) can
+# power down. USB is handled above; this does not touch the modem/keyboard.
+RUNTIME_PM_ON_AC=auto
+RUNTIME_PM_ON_BAT=auto
 EOF
 sudo systemctl enable tlp 2>/dev/null || true
 sudo tlp start 2>/dev/null || true   # apply immediately (no reboot needed)
@@ -114,6 +118,50 @@ PERCENT=50
 EOF
 sudo systemctl enable zramswap 2>/dev/null || true
 sudo systemctl restart zramswap 2>/dev/null || true
+
+# --- Wi-Fi power save + no connectivity ping (NetworkManager) ---------------
+sudo install -d -m 0755 /etc/NetworkManager/conf.d
+sudo tee /etc/NetworkManager/conf.d/01-uconsole-powersave.conf >/dev/null <<'EOF'
+# uConsole power saving (i3-desktop-setup).
+[connection]
+# 3 = enable Wi-Fi 802.11 power save (cuts idle radio draw); set 2 to disable.
+wifi.powersave=3
+
+[connectivity]
+# Disable the periodic connectivity check — it wakes the radio every few minutes.
+interval=0
+EOF
+# Reload config without dropping the active connection; PS applies on reconnect.
+sudo nmcli general reload conf 2>/dev/null || true
+
+# --- Fewer background wakeups ----------------------------------------------
+# Batch dirty-page writeback (fewer wakeups + less SD wear).
+sudo tee /etc/sysctl.d/60-uconsole-powersave.conf >/dev/null <<'EOF'
+# uConsole power saving: defer/batch disk writeback.
+vm.dirty_writeback_centisecs = 1500
+vm.dirty_expire_centisecs = 3000
+vm.laptop_mode = 5
+EOF
+sudo sysctl -q --system 2>/dev/null || true
+
+# Keep the journal in RAM (no periodic SD writes for logs). NOTE: logs then do
+# NOT survive a reboot; remove this drop-in (or run uninstall) to restore disk
+# logging. Minimal Debian is volatile by default anyway; this also caps the size.
+sudo install -d -m 0755 /etc/systemd/journald.conf.d
+sudo tee /etc/systemd/journald.conf.d/01-uconsole-powersave.conf >/dev/null <<'EOF'
+[Journal]
+Storage=volatile
+RuntimeMaxUse=32M
+EOF
+sudo systemctl restart systemd-journald 2>/dev/null || true
+
+# Disable periodic maintenance timers/services that wake the CPU. fstrim.timer is
+# kept on purpose (TRIM helps SD/eMMC longevity). Re-enable any of these with
+# `sudo systemctl enable --now <unit>`.
+for unit in apt-daily.timer apt-daily-upgrade.timer man-db.timer e2scrub_all.timer fwupd-refresh.timer; do
+    sudo systemctl disable --now "$unit" 2>/dev/null || true
+done
+sudo systemctl mask --now packagekit.service 2>/dev/null || true
 
 # Note: powertop is installed as a diagnostic tool only; we deliberately do NOT
 # enable --auto-tune, which would autosuspend USB (the modem/keyboard).
@@ -162,6 +210,17 @@ log_info "Bar/UI fonts sized for the 720p panel"
 
 # The status bar (i3status) is shared by all installs and already includes the
 # battery and the modem (shown as a network interface), so nothing to do here.
+
+# --- Turn off the ACT/PWR LEDs via config.txt (small, always-on saving) -----
+CFGTXT=/boot/firmware/config.txt
+[ -f "$CFGTXT" ] || CFGTXT=/boot/config.txt
+if [ -f "$CFGTXT" ]; then
+    sudo cp -n "$CFGTXT" "$CFGTXT.i3ds.bak" 2>/dev/null || true
+    sudo sed -i '/# >>> i3ds-power >>>/,/# <<< i3ds-power <<</d' "$CFGTXT"
+    printf '# >>> i3ds-power >>>\n[all]\ndtparam=act_led_trigger=none\ndtparam=act_led_activelow=off\ndtparam=pwr_led_trigger=none\ndtparam=pwr_led_activelow=off\n# <<< i3ds-power <<<\n' \
+        | sudo tee -a "$CFGTXT" >/dev/null
+    log_info "Disabled ACT/PWR LEDs in $CFGTXT — reboot to apply"
+fi
 
 # --- CPU underclock via config.txt (--underclock) --------------------------
 if [ -n "${UNDERCLOCK:-}" ]; then
